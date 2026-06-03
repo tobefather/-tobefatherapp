@@ -1,5 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/", "destination": "/2ToBeFather_V2.html" }
-  ]
-}
