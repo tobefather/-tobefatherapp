@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ToBeFather</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --navy:#1B3A5C; --blue:#2B6CB0; --blue-l:#EBF4FF;
+  --purple:#3C3489; --purple-m:#4E46A8; --purple-l:#EEEDFE;
+  --teal:#0F6E56; --teal-l:#E1F5EE;
+  --amber:#F6AD55; --amber-d:#C47B1E; --amber-l:#FEF3E0;
+  --green:#276749; --green-l:#C6F6D5;
+  --red:#9B2335; --red-l:#FED7D7;
+  --grey:#4A5568; --grey-l:#F7FAFC; --border:#E2E8F0;
+  --white:#FFFFFF; --text:#1A202C;
+}
+html,body { height:100%; background:#0D1520; font-family:'DM Sans',sans-serif; overflow:hidden; color:var(--text); }
+
+/* ── PHONE ── */
+.wrap { display:flex; align-items:center; justify-content:center; height:100vh; padding:16px; }
+.phone {
+  width:100%; max-width:393px; height:min(852px,calc(100vh - 32px));
+  background:var(--grey-l); border-radius:48px; overflow:hidden;
+  position:relative; display:flex; flex-direction:column;
+  box-shadow:0 48px 96px rgba(0,0,0,.7), 0 24px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* ── STATUS BAR ── */
+.sb { height:50px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 28px; transition:background .4s cubic-bezier(.25,.46,.45,.94); }
+.sb-time { font-size:15px; font-weight:600; color:white; letter-spacing:-.3px; }
+.sb-icons { display:flex; gap:6px; align-items:center; }
+
+/* ── SCREENS ── */
+.screen { display:none; flex:1; flex-direction:column; overflow:hidden; animation:fadeIn .25s ease both; }
+.screen.active { display:flex; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── HEADERS ── */
+.hd { padding:0 22px 18px; flex-shrink:0; position:relative; overflow:hidden; transition:background .35s; }
+.hd::after { content:''; position:absolute; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%); top:-80px; right:-60px; pointer-events:none; }
+.hd-top { display:flex; align-items:center; justify-content:space-between; padding:12px 0 16px; }
+.hd-title { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:white; }
+.hd-sub { font-size:13px; color:rgba(255,255,255,.5); margin-top:1px; }
+.hd-btn { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.1); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; color:white; transition:background .2s; }
+.hd-btn:hover { background:rgba(255,255,255,.18); }
+
+/* ── SCROLL BODY ── */
+.body { flex:1; overflow-y:auto; }
+.body::-webkit-scrollbar { width:0; }
+
+/* ── BOTTOM NAV ── */
+.nav {
+  height:88px; background:white; border-top:1px solid var(--border);
+  display:flex; align-items:flex-start; padding:12px 4px 0;
+  flex-shrink:0;
+}
+.ni { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 2px; transition:all .15s; -webkit-tap-highlight-color:transparent; }
+.ni-icon { font-size:23px; line-height:1; transition:transform .2s; }
+.ni:active .ni-icon { transform:scale(.88); }
+.ni-label { font-size:10px; font-weight:500; color:var(--grey); transition:color .2s; }
+.ni-dot { width:4px; height:4px; border-radius:50%; margin:0 auto; opacity:0; transition:opacity .2s; }
+.ni.active .ni-label { font-weight:600; }
+.ni.active .ni-dot { opacity:1; }
+
+/* ── CARDS ── */
+.card { background:white; border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+.card + .card { margin-top:12px; }
+.card-hd { padding:14px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.card-title { font-size:14px; font-weight:600; color:var(--navy); }
+.card-link { font-size:12px; font-weight:500; cursor:pointer; }
+.card-body { padding:14px 18px; }
+
+/* ── UTILS ── */
+.row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); }
+.row:last-child { border-bottom:none; padding-bottom:0; }
+.row:first-child { padding-top:0; }
+.rk { font-size:12px; color:var(--grey); }
+.rv { font-size:13px; font-weight:500; color:var(--text); }
+.pill { display:inline-block; font-size:10px; font-weight:500; padding:2px 8px; border-radius:8px; }
+.pill-ok { background:var(--green-l); color:var(--green); }
+.pill-warn { background:var(--amber-l); color:var(--amber-d); }
+.pill-red { background:var(--red-l); color:var(--red); }
+.pill-blue { background:var(--blue-l); color:var(--blue); }
+.pill-teal { background:var(--teal-l); color:var(--teal); }
+.pill-purple { background:var(--purple-l); color:var(--purple); }
+.bar-wrap { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:4px; }
+.bar-fill { height:100%; border-radius:2px; }
+.btn { width:100%; padding:15px; border:none; border-radius:16px; font-size:15px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .2s; }
+.btn-navy { background:var(--navy); color:white; }
+.btn-amber { background:var(--amber); color:var(--navy); box-shadow:0 4px 20px rgba(246,173,85,.35); }
+.btn-teal { background:var(--teal); color:white; }
+.btn-ghost { background:transparent; color:rgba(255,255,255,.55); border:1.5px solid rgba(255,255,255,.18); }
+.btn-ghost-dark { background:transparent; color:var(--grey); border:1.5px solid var(--border); }
+.section-title { font-size:11px; font-weight:700; color:var(--grey); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.sep { height:1px; background:var(--border); margin:0 -18px; }
+
+/* ── PANEL ── */
+.panel { display:none; position:absolute; inset:0; z-index:200; align-items:flex-end; pointer-events:none; }
+.panel.open { pointer-events:all; }
+.panel.open { display:flex; }
+.panel-bg { position:absolute; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(6px); }
+.panel-sheet { position:relative; width:100%; max-height:82vh; background:white; border-radius:28px 28px 0 0; overflow-y:auto; padding:20px 22px 44px; z-index:201; animation:slideUp .3s cubic-bezier(.25,.46,.45,.94); }
+.panel-sheet::-webkit-scrollbar { width:0; }
+.panel-handle { width:40px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 20px; }
+@keyframes slideUp { from{transform:translateY(100%);opacity:.5} to{transform:translateY(0);opacity:1} }
+
+/* ── TOAST ── */
+.toast { position:absolute; top:60px; left:20px; right:20px; pointer-events:none; padding:13px 16px; border-radius:16px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:10px; transform:translateY(-16px); opacity:0; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:300; pointer-events:none; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* ════════════════════════════════════
+   ONBOARDING
+════════════════════════════════════ */
+.ob { display:none; flex:1; flex-direction:column; overflow:hidden; }
+.ob.active { display:flex; }
+.ob-splash { flex:1; background:linear-gradient(160deg,#1B3A5C 0%,#0D1E30 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 28px; position:relative; overflow:hidden; }
+.ob-splash::before { content:''; position:absolute; width:320px; height:320px; border-radius:50%; background:radial-gradient(circle,rgba(43,108,176,.25) 0%,transparent 70%); top:-100px; right:-100px; }
+.ob-splash::after { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,rgba(246,173,85,.1) 0%,transparent 70%); bottom:40px; left:-60px; }
+.ob-logo { font-family:'Playfair Display',serif; font-size:48px; font-weight:700; color:white; letter-spacing:-1px; }
+.ob-logo span { color:var(--amber); }
+.ob-tag { font-size:13px; color:rgba(255,255,255,.5); margin-top:6px; margin-bottom:56px; letter-spacing:.3px; }
+
+/* Choix visuels onboarding */
+.ob-choices { display:flex; flex-direction:column; gap:10px; width:100%; margin-bottom:28px; }
+.ob-choice {
+  background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.12);
+  border-radius:18px; padding:16px 18px; cursor:pointer;
+  display:flex; align-items:center; gap:16px; transition:all .2s;
+}
+.ob-choice:hover, .ob-choice.sel { background:rgba(255,255,255,.13); border-color:var(--amber); }
+.ob-choice-icon { font-size:28px; flex-shrink:0; }
+.ob-choice-label { font-size:15px; font-weight:500; color:white; }
+.ob-choice-sub { font-size:12px; color:rgba(255,255,255,.5); margin-top:2px; }
+.ob-check { width:24px; height:24px; border-radius:50%; border:2px solid rgba(255,255,255,.2); margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:white; transition:all .2s; }
+.ob-choice.sel .ob-check { background:var(--amber); border-color:var(--amber); color:var(--navy); }
+
+.ob-hd { background:var(--navy); padding:14px 22px 22px; flex-shrink:0; }
+.ob-hd-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.ob-back { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.1); border:none; cursor:pointer; color:white; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.ob-step { font-size:12px; color:rgba(255,255,255,.45); }
+.ob-skip { font-size:13px; color:rgba(255,255,255,.45); background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.ob-title { font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:white; margin-bottom:5px; line-height:1.25; }
+.ob-sub { font-size:13px; color:rgba(255,255,255,.5); }
+.prog { height:3px; background:rgba(255,255,255,.12); border-radius:2px; margin-top:14px; display:flex; gap:5px; }
+.prog-seg { flex:1; border-radius:2px; transition:background .4s; }
+.prog-done { background:var(--blue); }
+.prog-active { background:var(--amber); }
+.prog-todo { background:rgba(255,255,255,.12); }
+.ob-body { flex:1; overflow-y:auto; padding:20px 22px; background:var(--grey-l); }
+.ob-body::-webkit-scrollbar { width:0; }
+.ob-foot { padding:14px 22px 24px; background:var(--grey-l); border-top:1px solid var(--border); flex-shrink:0; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:11px; font-weight:700; color:var(--grey); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.field input, .field select { width:100%; padding:14px 16px; border:1.5px solid var(--border); border-radius:14px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--text); background:white; outline:none; transition:border-color .2s; -webkit-appearance:none; }
+.field input:focus, .field select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(43,108,176,.1); }
+.field input::placeholder { color:#A0AEC0; }
+.opt { background:white; border:1.5px solid var(--border); border-radius:14px; padding:14px 16px; cursor:pointer; display:flex; align-items:center; gap:12px; margin-bottom:8px; transition:all .2s; }
+.opt.sel { border-color:var(--blue); background:var(--blue-l); }
+.opt-lbl { font-size:14px; font-weight:500; color:var(--text); }
+.opt-sub { font-size:11px; color:var(--grey); }
+.opt-ck { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all .2s; }
+.opt.sel .opt-ck { background:var(--blue); border-color:var(--blue); color:white; }
+
+/* ════════════════════════════════════
+   IA (ÉCRAN CENTRAL)
+════════════════════════════════════ */
+.chat-area { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+.chat-area::-webkit-scrollbar { width:0; }
+.bw { display:flex; gap:8px; max-width:88%; animation:fadeIn .3s ease both; }
+.bw.user { align-self:flex-end; flex-direction:row-reverse; }
+.bw.ai { align-self:flex-start; }
+.bav { width:28px; height:28px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; margin-top:2px; }
+.bav.ai { background:var(--purple-l); }
+.bav.user { background:var(--blue-l); }
+.bub { padding:11px 14px; border-radius:18px; font-size:14px; line-height:1.6; }
+.bub.ai { background:white; border:1px solid var(--border); border-radius:4px 18px 18px 18px; color:var(--text); }
+.bub.user { background:var(--purple); border-radius:18px 4px 18px 18px; color:white; }
+.bub.urgence { background:var(--red); border-radius:18px; color:white; }
+.bub-time { font-size:10px; margin-top:4px; color:var(--grey); }
+.bub.user .bub-time { color:rgba(255,255,255,.5); }
+.disc { font-size:10px; color:var(--grey); margin-top:5px; display:flex; align-items:center; gap:4px; }
+.typing { display:flex; align-items:center; gap:4px; padding:11px 14px; background:white; border:1px solid var(--border); border-radius:4px 18px 18px 18px; }
+.td { width:6px; height:6px; border-radius:50%; background:var(--grey); animation:ty 1.2s ease infinite; }
+.td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
+@keyframes ty{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.mod-sugg { margin-top:8px; background:var(--purple-l); border:1px solid rgba(60,52,137,.2); border-radius:12px; padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:background .2s; }
+.mod-sugg:hover { background:#E0DFF8; }
+.sugg-row { display:flex; gap:7px; overflow-x:auto; padding:8px 16px; background:white; border-bottom:1px solid var(--border); flex-shrink:0; }
+.sugg-row::-webkit-scrollbar { height:0; }
+.schip { flex-shrink:0; display:flex; align-items:center; gap:5px; padding:7px 13px; background:var(--grey-l); border:1.5px solid var(--border); border-radius:20px; cursor:pointer; font-size:12px; white-space:nowrap; transition:all .2s; }
+.schip:hover { border-color:var(--purple-m); background:var(--purple-l); }
+.cbar { display:flex; align-items:center; justify-content:space-between; padding:7px 18px; background:white; border-top:1px solid var(--border); flex-shrink:0; }
+.ia-input-area { background:white; border-top:1px solid var(--border); padding:10px 14px 14px; flex-shrink:0; display:flex; align-items:flex-end; gap:10px; }
+.ia-input { flex:1; background:var(--grey-l); border:1.5px solid var(--border); border-radius:22px; padding:11px 16px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; resize:none; min-height:44px; max-height:110px; line-height:1.5; transition:border-color .2s, box-shadow .2s; }
+.ia-input:focus { border-color:var(--purple-m); box-shadow:0 0 0 3px rgba(78,70,168,.1); }
+.ia-input::placeholder { color:#A0AEC0; }
+.send { width:44px; height:44px; border-radius:50%; background:var(--purple); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; }
+.send:hover { background:var(--purple-m); transform:scale(1.06); }
+.send svg { width:18px; height:18px; fill:white; }
+
+/* ════════════════════════════════════
+   GRIMOIRE
+════════════════════════════════════ */
+.g-tabs { display:flex; background:white; border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0; }
+.g-tabs::-webkit-scrollbar { height:0; }
+.gtab { flex-shrink:0; padding:12px 14px; font-size:12px; font-weight:500; color:var(--grey); cursor:pointer; border-bottom:2.5px solid transparent; transition:all .25s cubic-bezier(.25,.46,.45,.94); white-space:nowrap; -webkit-tap-highlight-color:transparent; }
+.gtab.active { color:var(--teal); border-bottom-color:var(--teal); font-weight:600; }
+.gmod { display:none; }
+.gmod.active { display:block; }
+.vaccin-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+.vaccin-row:last-child { border-bottom:none; padding-bottom:0; }
+.vaccin-row:first-child { padding-top:0; }
+.vdot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.stock-row { padding:9px 0; border-bottom:1px solid var(--border); }
+.stock-row:last-child { border-bottom:none; padding-bottom:0; }
+.stock-row:first-child { padding-top:0; }
+.ck-item { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--grey-l); border-radius:11px; cursor:pointer; margin-bottom:5px; transition:all .15s; }
+.ck-item:active { opacity:.7; }
+.ck-box { width:22px; height:22px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.ck-item.done .ck-box { background:var(--teal); border-color:var(--teal); color:white; font-size:12px; }
+.ck-item.done .ck-text { text-decoration:line-through; color:var(--grey); }
+.ck-text { font-size:13px; color:var(--text); flex:1; }
+.doc-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.doc-row:last-child { border-bottom:none; padding-bottom:0; }
+.doc-row:first-child { padding-top:0; }
+.doc-ic { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.add-btn { width:100%; padding:12px; background:var(--teal-l); color:var(--teal); border:1.5px dashed var(--teal); border-radius:14px; font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; margin-top:10px; transition:all .2s; }
+.add-btn:hover { background:var(--teal); color:white; }
+
+/* ════════════════════════════════════
+   BRIEF
+════════════════════════════════════ */
+.xp-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:14px 16px; }
+.xp-track { height:5px; background:rgba(255,255,255,.15); border-radius:3px; overflow:hidden; margin:8px 0 4px; }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(--amber),#F0A040); border-radius:3px; width:28%; }
+.phase-filter { display:flex; gap:8px; padding:10px 16px; background:white; border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0; }
+.phase-filter::-webkit-scrollbar { height:0; }
+.phase-pill { flex-shrink:0; padding:6px 13px; border-radius:20px; font-size:12px; font-weight:500; cursor:pointer; border:1.5px solid var(--border); color:var(--grey); background:var(--grey-l); transition:all .2s; white-space:nowrap; }
+.phase-pill.active { background:var(--navy); color:white; border-color:var(--navy); }
+.mod-card { background:white; border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.mod-card:hover { border-color:var(--blue); transform:translateX(2px); }
+.mod-card.locked { opacity:.5; cursor:default; }
+.mod-card.current { border-color:var(--amber); border-width:2px; }
+.mod-card.done { opacity:.75; }
+.mod-ic { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.mod-st { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.phase-sep { font-size:11px; font-weight:700; color:var(--grey); text-transform:uppercase; letter-spacing:.07em; margin:10px 0 6px; }
+
+/* Reader */
+.reader-hd { background:var(--navy); padding:14px 22px 16px; flex-shrink:0; }
+.reader-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.sdots { display:flex; gap:5px; }
+.sdot { height:4px; border-radius:2px; transition:all .4s; }
+.sdot.done { background:var(--green); flex:1; }
+.sdot.active { background:var(--amber); flex:2; }
+.sdot.todo { background:rgba(255,255,255,.2); flex:1; }
+.step-tag { display:inline-block; font-size:11px; font-weight:600; padding:3px 12px; border-radius:20px; margin-bottom:10px; text-transform:uppercase; letter-spacing:.05em; }
+.step-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:var(--navy); margin-bottom:12px; line-height:1.3; }
+.step-body { font-size:14px; color:var(--text); line-height:1.75; margin-bottom:12px; }
+.step-item { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:var(--grey-l); border-radius:12px; margin-bottom:6px; font-size:13px; color:var(--text); line-height:1.5; }
+.proto-card { background:linear-gradient(135deg,var(--navy),#243F64); border-radius:14px; padding:14px; margin:10px 0; }
+.proto-title { font-size:11px; font-weight:700; color:var(--amber); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+.proto-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.proto-item:last-child { border-bottom:none; padding-bottom:0; }
+.proto-l { font-size:16px; font-weight:800; color:var(--amber); width:20px; flex-shrink:0; }
+.proto-t { font-size:13px; color:rgba(255,255,255,.85); line-height:1.5; flex:1; }
+.step-note { background:var(--blue-l); border-left:3px solid var(--blue); border-radius:0 10px 10px 0; padding:10px 14px; font-size:12px; color:var(--blue); margin-top:10px; line-height:1.5; }
+.quiz-opt { padding:13px 16px; background:white; border:2px solid var(--border); border-radius:14px; cursor:pointer; font-size:14px; color:var(--text); margin-bottom:10px; transition:all .2s; }
+.quiz-opt:hover:not(.disabled) { border-color:var(--purple); }
+.quiz-opt.correct { border-color:var(--green); background:var(--green-l); color:var(--green); }
+.quiz-opt.wrong { border-color:var(--red); background:var(--red-l); color:var(--red); }
+.quiz-opt.disabled { cursor:default; }
+.quiz-fb { padding:12px 14px; border-radius:12px; font-size:13px; margin-top:4px; display:none; line-height:1.5; }
+.quiz-fb.show { display:block; }
+.badge-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 28px; text-align:center; background:linear-gradient(160deg,var(--navy),#0D1E30); }
+.badge-ring { width:120px; height:120px; border-radius:50%; background:rgba(246,173,85,.15); border:3px solid rgba(246,173,85,.4); display:flex; align-items:center; justify-content:center; font-size:54px; margin-bottom:22px; animation:pop .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes pop { from{transform:scale(.2);opacity:0} to{transform:scale(1);opacity:1} }
+.badge-foot { padding:0 24px 40px; background:linear-gradient(160deg,var(--navy),#0D1E30); }
+
+/* ════════════════════════════════════
+   COMPTE
+════════════════════════════════════ */
+.avatar-big { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--blue),var(--navy)); display:flex; align-items:center; justify-content:center; font-size:36px; margin:0 auto 12px; }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.stat-card { background:white; border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
+.stat-val { font-size:22px; font-weight:700; color:var(--navy); }
+.stat-lbl { font-size:11px; color:var(--grey); margin-top:2px; }
+.menu-item { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:opacity .2s; }
+.menu-item:last-child { border-bottom:none; }
+.menu-item:active { opacity:.6; }
+.menu-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.menu-label { font-size:14px; font-weight:500; color:var(--text); flex:1; }
+.menu-arrow { font-size:18px; color:var(--grey); }
+
+@keyframes breathe { 0%,100%{transform:scale(1);opacity:.9} 50%{transform:scale(1.08);opacity:1} }
+
+/* ── GLOBAL POLISH ── */
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+input, textarea, select, button { -webkit-tap-highlight-color: transparent; }
+.body { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+
+/* ── CARD CONSISTENCY ── */
+.card { border-radius:18px; transition: transform .15s, box-shadow .15s; }
+
+/* ── BUTTON POLISH ── */
+.btn { letter-spacing:.01em; }
+.btn-navy:hover { background:#243F64; }
+.btn-amber:hover { background:#E8991F; }
+.btn-teal:hover { background:#0A5242; }
+.btn:active { transform: scale(.97); opacity:.92; }
+
+/* ── NAV ACTIVE STATES ── */
+.ni { -webkit-tap-highlight-color: transparent; user-select:none; }
+.ni:active { opacity:.6; }
+.ni.active .ni-icon { filter: drop-shadow(0 0 5px rgba(0,0,0,.15)); }
+
+/* ── INPUT POLISH ── */
+.field input, .field select {
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus {
+  box-shadow: 0 0 0 3px rgba(43,108,176,.12);
+  outline: none;
+}
+
+/* ── PANEL POLISH ── */
+.panel-sheet {
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+}
+
+/* ── SCREEN TRANSITIONS ── */
+.screen.active { animation: screenIn .3s cubic-bezier(.25,.46,.45,.94) both; }
+@keyframes screenIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── HERO CARD GLOW ── */
+.hd { box-shadow: 0 4px 24px rgba(0,0,0,.15); }
+
+/* ── CHECKLIST ITEM POLISH ── */
+.ck-item:hover { background: #EDF2F7; }
+.ck-item.done { background: #F0FFF4; }
+.ck-item.done .ck-box { box-shadow: 0 2px 6px rgba(39,103,73,.25); }
+
+/* ── BADGE ANIMATIONS ── */
+.badge-ring { box-shadow: 0 0 0 8px rgba(246,173,85,.08), 0 0 0 16px rgba(246,173,85,.04); }
+
+/* ── SCROLL BODY VISUAL ── */
+.body::-webkit-scrollbar { width: 0; }
+.panel-sheet::-webkit-scrollbar { width: 0; }
+
+/* ── ONBOARDING CHOICE POLISH ── */
+.ob-choice { transition: all .2s cubic-bezier(.25,.46,.45,.94); }
+.ob-choice:active { transform: scale(.97); }
+
+/* ── MODULE CARD POLISH ── */
+.mod-card { transition: all .2s cubic-bezier(.25,.46,.45,.94); }
+.mod-card:not(.locked):hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.mod-card:not(.locked):active { transform: scale(.98); }
+
+/* ── MENU ITEM POLISH ── */
+.menu-item { transition: background .15s; border-radius: 12px; margin: 0 -4px; padding: 14px 4px; }
+.menu-item:hover { background: var(--grey-l); }
+.menu-item:active { background: var(--border); }
+
+/* ── STAT CARD HOVER ── */
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); transition: all .2s; }
+
+/* ── BOTTOM NAV PREMIUM FEEL ── */
+.nav {
+  box-shadow: 0 -1px 0 var(--border), 0 -8px 24px rgba(0,0,0,.04);
+}
+
+/* ── GRIMOIRE TABS ── */
+.gtab { transition: all .2s; }
+.gtab:hover:not(.active) { color: var(--teal); background: var(--teal-l); }
+
+/* ── PHASE FILTER ── */
+.phase-pill { transition: all .2s cubic-bezier(.25,.46,.45,.94); }
+.phase-pill:active { transform: scale(.95); }
+
+/* ── SUGG CHIPS ── */
+.schip { transition: all .2s; }
+.schip:active { transform: scale(.95); }
+
+/* ── CHAT BUBBLES ── */
+.bub.ai { box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.bub.user { box-shadow: 0 2px 8px rgba(60,52,137,.25); }
+
+/* ── SEND BUTTON PULSE ── */
+.send { box-shadow: 0 4px 14px rgba(60,52,137,.35); }
+.send:active { transform: scale(.92); box-shadow: none; }
+
+/* ── QUIZ OPTIONS ── */
+.quiz-opt { transition: all .15s; }
+.quiz-opt:not(.disabled):hover { border-color: var(--purple); background: var(--purple-l); }
+.quiz-opt:not(.disabled):active { transform: scale(.98); }
+
+/* ── STEP DOTS SMOOTH ── */
+.sdot { transition: all .5s cubic-bezier(.25,.46,.45,.94); }
+
+/* ── VACCIN DOTS ── */
+.vdot { box-shadow: 0 0 0 3px rgba(255,255,255,1), 0 0 0 4px currentColor; }
+
+/* ── PILL BADGES ── */
+.pill { transition: all .15s; letter-spacing: .02em; }
+
+/* ── OB CHOICE SELECTED GLOW ── */
+.ob-choice.sel { box-shadow: 0 0 0 2px var(--amber), 0 8px 24px rgba(246,173,85,.15); }
+
+/* ── PROGRESS BARS SMOOTH ── */
+.bar-fill, .xp-fill { transition: width .6s cubic-bezier(.25,.46,.45,.94); }
+
+/* ── READER BODY PADDING ── */
+#r-body { padding-bottom: 24px; }
+#q-body { padding-bottom: 24px; }
+
+/* ── BACKDROP BLUR ENHANCED ── */
+.panel-bg { backdrop-filter: blur(8px) brightness(.85); -webkit-backdrop-filter: blur(8px) brightness(.85); }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="wrap">
+<div class="phone">
+
+<div class="sb" id="sb" style="background:var(--navy)">
+  <span class="sb-time" id="sb-time">9:41</span>
+  <div class="sb-icons">
+    <svg width="17" height="12" viewBox="0 0 17 12" fill="white" opacity=".9"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="5" y="2.5" width="3" height="9.5" rx="1"/><rect x="10" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="23" height="11" rx="3.5" stroke="white" stroke-opacity=".35"/><rect x="2" y="2" width="18" height="8" rx="2" fill="white"/><path d="M25 4.5V7.5C25.8 7.2 26.5 6.5 26.5 6 26.5 5.5 25.8 4.8 25 4.5Z" fill="white" opacity=".4"/></svg>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="panel" id="panel"><div class="panel-bg" onclick="closePanel()"></div><div class="panel-sheet"><div class="panel-handle"></div><div id="panel-inner"></div></div></div>
+
+<!-- ══════════════════════════════════════
+     ONBOARDING
+══════════════════════════════════════ -->
+<div class="screen active" id="sc-onboarding" style="background:var(--grey-l)">
+
+  <!-- Splash -->
+  <div class="ob active" id="ob-splash" style="background:linear-gradient(160deg,#1B3A5C,#0D1E30)">
+    <div class="ob-splash">
+      <div class="ob-logo">To<span>Be</span>Father</div>
+      <div class="ob-tag">Le copilote de la paternité moderne</div>
+      <div class="ob-choices">
+        <div class="ob-choice sel" onclick="selOb(this,'situation','envie')" data-val="envie">
+          <div class="ob-choice-icon">✨</div>
+          <div><div class="ob-choice-label">J'ai envie d'avoir un enfant</div><div class="ob-choice-sub">Préparation, fertilité, projet de couple</div></div>
+          <div class="ob-check">✓</div>
+        </div>
+        <div class="ob-choice" onclick="selOb(this,'situation','grossesse')" data-val="grossesse">
+          <div class="ob-choice-icon">🤰</div>
+          <div><div class="ob-choice-label">Ma partenaire est enceinte</div><div class="ob-choice-sub">Accompagnement grossesse, préparation</div></div>
+          <div class="ob-check">✓</div>
+        </div>
+        <div class="ob-choice" onclick="selOb(this,'situation','naissance')" data-val="naissance">
+          <div class="ob-choice-icon">🍼</div>
+          <div><div class="ob-choice-label">Mon bébé vient de naître</div><div class="ob-choice-sub">Retour maternité, premières semaines</div></div>
+          <div class="ob-check">✓</div>
+        </div>
+        <div class="ob-choice" onclick="selOb(this,'situation','deja')" data-val="deja">
+          <div class="ob-choice-icon">👶</div>
+          <div><div class="ob-choice-label">Mon enfant a déjà quelques mois</div><div class="ob-choice-sub">Éveil, développement, quotidien</div></div>
+          <div class="ob-check">✓</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 28px 36px;background:linear-gradient(160deg,#1B3A5C,#0D1E30)">
+      <button class="btn btn-amber" onclick="goOb('ob-situation')">Commencer →</button>
+      <button class="btn btn-ghost" onclick="goOb('ob-situation')" style="margin-top:10px">J'ai déjà un compte</button>
+    </div>
+  </div>
+
+  <!-- Situation précise -->
+  <div class="ob" id="ob-situation" style="flex-direction:column">
+    <div class="ob-hd">
+      <div class="ob-hd-top"><button class="ob-back" onclick="goOb('ob-splash')">←</button><span class="ob-step">Étape 2 / 4</span><div style="width:36px"></div></div>
+      <div class="ob-title" id="ob-sit-title">Ta situation précise</div>
+      <div class="ob-sub" id="ob-sit-sub">Pour adapter chaque contenu à ton contexte réel</div>
+      <div class="prog"><div class="prog-done"></div><div class="prog-active"></div><div class="prog-todo"></div><div class="prog-todo"></div></div>
+    </div>
+    <div class="ob-body" id="ob-sit-body">
+      <div class="opt sel" onclick="selOpt(this,'sem')" data-val="14"><div style="font-size:20px;flex-shrink:0">📅</div><div><div class="opt-lbl">Semaine 14</div><div class="opt-sub">2ème trimestre — tout va bien</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'sem')" data-val="8"><div style="font-size:20px;flex-shrink:0">🌱</div><div><div class="opt-lbl">Moins de 12 semaines</div><div class="opt-sub">1er trimestre</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'sem')" data-val="28"><div style="font-size:20px;flex-shrink:0">🏁</div><div><div class="opt-lbl">Plus de 28 semaines</div><div class="opt-sub">3ème trimestre — la ligne droite</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'sem')" data-val="multi"><div style="font-size:20px;flex-shrink:0">👯</div><div><div class="opt-lbl">Grossesse multiple</div><div class="opt-sub">Jumeaux, triplés</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'sem')" data-val="compli"><div style="font-size:20px;flex-shrink:0">⚕️</div><div><div class="opt-lbl">Grossesse avec complication</div><div class="opt-sub">Pré-éclampsie, diabète, etc.</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'sem')" data-val="fc"><div style="font-size:20px;flex-shrink:0">💙</div><div><div class="opt-lbl">Après une fausse couche</div><div class="opt-sub">Reprise du parcours à ton rythme</div></div><div class="opt-ck">✓</div></div>
+    </div>
+    <div class="ob-foot"><button class="btn btn-navy" onclick="goOb('ob-priorite')">Continuer →</button></div>
+  </div>
+
+  <!-- Priorités -->
+  <div class="ob" id="ob-priorite" style="flex-direction:column">
+    <div class="ob-hd">
+      <div class="ob-hd-top"><button class="ob-back" onclick="goOb('ob-situation')">←</button><span class="ob-step">Étape 3 / 4</span><div style="width:36px"></div></div>
+      <div class="ob-title">Ce qui compte pour toi</div>
+      <div class="ob-sub">Pour te donner les bons outils en priorité</div>
+      <div class="prog"><div class="prog-done"></div><div class="prog-done"></div><div class="prog-active"></div><div class="prog-todo"></div></div>
+    </div>
+    <div class="ob-body">
+      <div class="opt sel" onclick="selOpt(this,'prio')" data-val="orga"><div style="font-size:20px;flex-shrink:0">📋</div><div><div class="opt-lbl">Organisation et logistique</div><div class="opt-sub">Ne rien oublier, tout préparer</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'prio')" data-val="know"><div style="font-size:20px;flex-shrink:0">🧠</div><div><div class="opt-lbl">Connaissances et compétences</div><div class="opt-sub">Savoir quoi faire et pourquoi</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'prio')" data-val="emo"><div style="font-size:20px;flex-shrink:0">❤️</div><div><div class="opt-lbl">Préparation émotionnelle</div><div class="opt-sub">Être prêt psychologiquement</div></div><div class="opt-ck">✓</div></div>
+      <div class="opt" onclick="selOpt(this,'prio')" data-val="couple"><div style="font-size:20px;flex-shrink:0">💑</div><div><div class="opt-lbl">Relation avec le co-parent</div><div class="opt-sub">Être vraiment là, pas juste présent</div></div><div class="opt-ck">✓</div></div>
+      <div style="margin-top:14px">
+        <div class="field"><label>Ton niveau d'implication souhaité</label>
+          <div class="opt" onclick="selOpt(this,'level')" data-val="all" style="margin-bottom:8px"><div style="font-size:18px;flex-shrink:0">🦁</div><div><div class="opt-lbl">Je veux tout savoir</div><div class="opt-sub">Contenu complet, rien n'est laissé de côté</div></div><div class="opt-ck">✓</div></div>
+          <div class="opt" onclick="selOpt(this,'level')" data-val="essentials"><div style="font-size:18px;flex-shrink:0">⚡</div><div><div class="opt-lbl">Je veux juste les essentiels</div><div class="opt-sub">Direct, concret, sans superflu</div></div><div class="opt-ck">✓</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ob-foot"><button class="btn btn-navy" onclick="goOb('ob-profil')">Continuer →</button></div>
+  </div>
+
+  <!-- Profil -->
+  <div class="ob" id="ob-profil" style="flex-direction:column">
+    <div class="ob-hd">
+      <div class="ob-hd-top"><button class="ob-back" onclick="goOb('ob-priorite')">←</button><span class="ob-step">Étape 4 / 4</span><div style="width:36px"></div></div>
+      <div class="ob-title">Dernière étape</div>
+      <div class="ob-sub">Pour que je puisse te parler par ton prénom</div>
+      <div class="prog"><div class="prog-done"></div><div class="prog-done"></div><div class="prog-done"></div><div class="prog-active"></div></div>
+    </div>
+    <div class="ob-body">
+      <div class="field"><label>Ton prénom</label><input type="text" id="inp-prenom" placeholder="Thomas" autocomplete="given-name"></div>
+      <div class="field"><label>Email</label><input type="email" id="inp-email" placeholder="thomas@exemple.com" autocomplete="email"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="inp-pass" placeholder="8 caractères minimum"></div>
+      <div style="margin-top:16px">
+        <div style="text-align:center;font-size:12px;color:var(--grey);margin-bottom:12px">ou continuer avec</div>
+        <div class="opt" style="justify-content:center;gap:10px;margin-bottom:0" onclick="showToast('Google Sign-In bientôt disponible')"><span style="font-size:18px;font-weight:700;color:#4285F4">G</span><span style="font-weight:600;color:var(--navy)">Continuer avec Google</span></div>
+      </div>
+    </div>
+    <div class="ob-foot"><button class="btn btn-amber" onclick="finishOnboarding()">Créer mon compte →</button></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     APP (après onboarding)
+══════════════════════════════════════ -->
+
+<!-- COMPTE -->
+<div class="screen" id="sc-compte">
+  <div class="hd" style="background:var(--navy)">
+    <div class="hd-top">
+      <div><div class="hd-title">Mon compte</div><div class="hd-sub">Thomas · Grossesse S14</div></div>
+      <div style="display:flex;gap:8px">
+        <div class="hd-btn" onclick="openPanel('notifs')">🔔</div>
+        <div class="hd-btn" onclick="openPanel('settings')">⚙️</div>
+      </div>
+    </div>
+  </div>
+  <div class="body" style="padding:16px">
+
+    <!-- PROFIL HERO -->
+    <div style="background:linear-gradient(135deg,var(--navy),#243F64);border-radius:20px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(246,173,85,.15) 0%,transparent 70%);top:-40px;right:-40px"></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+        <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--navy));display:flex;align-items:center;justify-content:center;font-size:30px;border:2px solid rgba(255,255,255,.2);flex-shrink:0">👨</div>
+        <div style="flex:1">
+          <div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700;color:white" id="compte-name">Thomas</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Père en devenir · Grossesse S14</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="background:rgba(246,173,85,.2);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px">Nv1 🌱</span>
+            <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;padding:3px 10px;border-radius:10px">🔥 7 jours</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- XP Progress -->
+      <div style="margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:rgba(255,255,255,.6)">Père en devenir → Père préparé</span>
+        <span style="font-size:11px;font-weight:600;color:var(--amber)">280 / 1000 XP</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden">
+        <div style="width:28%;height:100%;background:linear-gradient(90deg,var(--amber),#F0A040);border-radius:3px;transition:width .6s"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:5px">720 XP pour atteindre le niveau 2 — Père préparé</div>
+    </div>
+
+    <!-- STATS GRID -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="card" style="margin-bottom:0">
+        <div style="padding:14px;text-align:center">
+          <div style="font-size:26px;font-weight:700;color:var(--navy)">3</div>
+          <div style="font-size:11px;color:var(--grey);margin-top:2px">Modules</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:4px">complétés</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="padding:14px;text-align:center">
+          <div style="font-size:26px;font-weight:700;color:var(--amber-d)">🔥 7</div>
+          <div style="font-size:11px;color:var(--grey);margin-top:2px">Jours</div>
+          <div style="font-size:10px;color:var(--amber-d);margin-top:4px">de streak</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="padding:14px;text-align:center">
+          <div style="font-size:26px;font-weight:700;color:var(--navy)">280</div>
+          <div style="font-size:11px;color:var(--grey);margin-top:2px">XP total</div>
+          <div style="font-size:10px;color:var(--purple);margin-top:4px">accumulés</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BADGES -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-hd">
+        <div class="card-title">🏆 Mes badges</div>
+        <div class="card-link" style="color:var(--navy)" onclick="openPanel('all-badges')">Voir tout</div>
+      </div>
+      <div class="card-body">
+        <!-- Badges débloqués -->
+        <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Débloqués</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <div style="text-align:center;cursor:pointer" onclick="openPanel('badge-detail-1')">
+            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#276749,#1a4a30);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:5px;box-shadow:0 4px 12px rgba(39,103,73,.3)">🌱</div>
+            <div style="font-size:10px;font-weight:500;color:var(--navy);line-height:1.3">Père en<br>devenir</div>
+          </div>
+          <div style="text-align:center;cursor:pointer" onclick="openPanel('badge-detail-2')">
+            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#2B6CB0,#1B3A5C);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:5px;box-shadow:0 4px 12px rgba(43,108,176,.3)">🧬</div>
+            <div style="font-size:10px;font-weight:500;color:var(--navy);line-height:1.3">Explorateur<br>du ventre</div>
+          </div>
+          <div style="text-align:center;cursor:pointer" onclick="openPanel('badge-detail-3')">
+            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#3C3489,#2B246B);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:5px;box-shadow:0 4px 12px rgba(60,52,137,.3)">🔊</div>
+            <div style="font-size:10px;font-weight:500;color:var(--navy);line-height:1.3">Écho<br>Master</div>
+          </div>
+        </div>
+        <!-- Badge en cours -->
+        <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">En cours</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--amber-l);border-radius:14px;cursor:pointer" onclick="openPanel('chambre')">
+          <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--amber-d),#8B5500);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏠</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--navy)">Chef Logistique</div>
+            <div style="font-size:11px;color:var(--grey)">Complète le module "Chambre bébé"</div>
+            <div style="height:3px;background:rgba(196,123,30,.2);border-radius:2px;margin-top:6px;overflow:hidden">
+              <div style="width:60%;height:100%;background:var(--amber-d);border-radius:2px"></div>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--amber-d)">60%</div>
+        </div>
+        <!-- Badges verrouillés -->
+        <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 10px">À débloquer</div>
+        <div style="display:flex;gap:8px">
+          <div style="text-align:center;opacity:.4">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">💑</div>
+            <div style="font-size:9px;color:var(--grey);line-height:1.3">Pilier du<br>Foyer</div>
+          </div>
+          <div style="text-align:center;opacity:.4">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">⏰</div>
+            <div style="font-size:9px;color:var(--grey);line-height:1.3">Expert<br>Droits</div>
+          </div>
+          <div style="text-align:center;opacity:.4">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">🏥</div>
+            <div style="font-size:9px;color:var(--grey);line-height:1.3">Maître de<br>la Valise</div>
+          </div>
+          <div style="text-align:center;opacity:.4">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">😭</div>
+            <div style="font-size:9px;color:var(--grey);line-height:1.3">Décodeur<br>Pleurs</div>
+          </div>
+          <div style="text-align:center;opacity:.4">
+            <div style="width:46px;height:46px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">🛁</div>
+            <div style="font-size:9px;color:var(--grey);line-height:1.3">Maître du<br>Bain</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITÉ RÉCENTE -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-hd"><div class="card-title">📅 Activité récente</div></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔊</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">Module complété</div><div style="font-size:11px;color:var(--grey)">Mon rôle aux échographies · +80 XP</div></div>
+          <div style="font-size:11px;color:var(--grey);flex-shrink:0">Hier</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✅</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">Checklist mise à jour</div><div style="font-size:11px;color:var(--grey)">Valise maternité · 4/14 cochés</div></div>
+          <div style="font-size:11px;color:var(--grey);flex-shrink:0">Hier</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--purple-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤖</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">Question IA</div><div style="font-size:11px;color:var(--grey)">Écho morphologique — questions à préparer</div></div>
+          <div style="font-size:11px;color:var(--grey);flex-shrink:0">Il y a 2j</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:8px 0">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--amber-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏆</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">Badge débloqué</div><div style="font-size:11px;color:var(--grey)">Écho Master · +80 XP</div></div>
+          <div style="font-size:11px;color:var(--grey);flex-shrink:0">Il y a 2j</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-body">
+        <div class="menu-item" onclick="openPanel('profil-edit')">
+          <div class="menu-icon" style="background:var(--blue-l)">👤</div>
+          <div class="menu-label">Mon profil</div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="openPanel('bebe-profil')">
+          <div class="menu-icon" style="background:var(--teal-l)">🤰</div>
+          <div class="menu-label">Grossesse · Semaine 14</div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="openPanel('premium')">
+          <div class="menu-icon" style="background:var(--amber-l)">👑</div>
+          <div style="flex:1">
+            <div class="menu-label">Passer Premium</div>
+            <div style="font-size:11px;color:var(--grey)">IA illimitée · 5,99€/mois</div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="openPanel('notifs-settings')">
+          <div class="menu-icon" style="background:var(--grey-l)">🔔</div>
+          <div class="menu-label">Notifications</div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="openPanel('supabase-info')">
+          <div class="menu-icon" style="background:var(--green-l)">🗄️</div>
+          <div style="flex:1">
+            <div class="menu-label">Connecter Supabase</div>
+            <div style="font-size:11px;color:var(--teal)">Synchroniser tes données</div>
+          </div>
+          <div class="menu-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NIVEAU SUIVANT -->
+    <div style="background:var(--navy);border-radius:16px;padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:8px">Pour atteindre Nv2 — Père préparé</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.8)">
+          <div style="width:18px;height:18px;border-radius:50%;background:rgba(246,173,85,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">1</div>
+          Compléter le module "Chambre bébé" (+100 XP)
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.8)">
+          <div style="width:18px;height:18px;border-radius:50%;background:rgba(246,173,85,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">2</div>
+          Compléter "Soutenir Marie" (+80 XP)
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.8)">
+          <div style="width:18px;height:18px;border-radius:50%;background:rgba(246,173,85,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">3</div>
+          Compléter 7 jours de streak (encore 0 jours)
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="nav">
+    <div class="ni active" onclick="goTab('compte','#1B3A5C')"><div class="ni-icon">👤</div><div class="ni-label" style="color:var(--navy)">Compte</div><div class="ni-dot" style="background:var(--navy);opacity:1"></div></div>
+    <div class="ni" onclick="goTab('grimoire','#0F6E56')"><div class="ni-icon">📖</div><div class="ni-label">Grimoire</div><div class="ni-dot" style="background:var(--teal)"></div></div>
+    <div class="ni" onclick="goTab('ia','#3C3489')"><div class="ni-icon">🤖</div><div class="ni-label">IA</div><div class="ni-dot" style="background:var(--purple)"></div></div>
+    <div class="ni" onclick="goTab('brief','#1B3A5C')"><div class="ni-icon">🧠</div><div class="ni-label">Brief</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    <div class="ni" onclick="openPanel('community')"><div class="ni-icon">👥</div><div class="ni-label">Communauté</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+  </div>
+</div>
+
+<!-- GRIMOIRE -->
+<div class="screen" id="sc-grimoire">
+  <div class="hd" style="background:var(--teal)">
+    <div class="hd-top">
+      <div><div class="hd-title">📖 Le Grimoire</div><div class="hd-sub">Grossesse S14 · Marie &amp; Thomas</div></div>
+      <div style="display:flex;gap:8px">
+        <div class="hd-btn" style="font-size:14px" onclick="openPanel('search')">🔍</div>
+        <div class="hd-btn" style="font-size:14px" onclick="openPanel('add-doc')">＋</div>
+      </div>
+    </div>
+  </div>
+  <div class="g-tabs">
+    <div class="gtab active" onclick="switchGrim('sante',this)">❤️ Santé</div>
+    <div class="gtab" onclick="switchGrim('docs',this)">📄 Documents</div>
+    <div class="gtab" onclick="switchGrim('checklists',this)">✅ Checklists</div>
+    <div class="gtab" onclick="switchGrim('coparent',this)">👩 Co-parent</div>
+  </div>
+  <div class="body">
+
+    <!-- ── SANTÉ ── -->
+    <div class="gmod active" id="gm-sante" style="padding:14px">
+
+      <!-- Semaine grossesse -->
+      <div style="background:linear-gradient(135deg,var(--teal),#0A5242);border-radius:18px;padding:16px 18px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Grossesse</div>
+            <div style="font-family:Playfair Display,serif;font-size:26px;font-weight:700;color:white">Semaine 14</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">2ème trimestre · Terme le 15 oct. 2026</div>
+          </div>
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px">🤰</div>
+        </div>
+        <!-- Progress bar grossesse -->
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:11px;color:rgba(255,255,255,.6)">Semaine 1</span>
+            <span style="font-size:11px;font-weight:600;color:var(--amber)">S14 — 35%</span>
+            <span style="font-size:11px;color:rgba(255,255,255,.6)">Semaine 40</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden">
+            <div style="width:35%;height:100%;background:linear-gradient(90deg,var(--amber),#F0A040);border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:white">182</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6)">Jours restants</div>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:var(--amber)">S22</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6)">Prochaine écho</div>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:white">T2</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6)">Trimestre</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Développement bébé S14 -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">👶 Bébé cette semaine</div><div class="card-link" style="color:var(--teal)" onclick="openPanel('bebe-dev')">Détails</div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:14px;align-items:center">
+            <div style="width:56px;height:56px;border-radius:16px;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🍋</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px">Taille d'un citron</div>
+              <div style="font-size:12px;color:var(--grey);line-height:1.5">8,5 cm · ~43g · Le visage prend forme, les expressions apparaissent</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill pill-teal">Ouïe se développe</span>
+            <span class="pill pill-teal">Pouce suçé</span>
+            <span class="pill pill-blue">Mouvements actifs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suivi médical -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">🩺 Suivi médical</div><div class="card-link" style="color:var(--teal)" onclick="openPanel('add-rdv')">+ RDV</div></div>
+        <div class="card-body">
+
+          <!-- RDV passés -->
+          <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Passés</div>
+          <div class="vaccin-row">
+            <div class="vdot" style="background:var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Écho T1 — S12</div>
+              <div style="font-size:11px;color:var(--grey)">Dr. Lemaire · 28 avril · Tout normal, clarté nucale 1,2mm</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="vaccin-row">
+            <div class="vdot" style="background:var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Prise de sang T1</div>
+              <div style="font-size:11px;color:var(--grey)">Laboratoire Cerba · 28 avril · β-hCG et PAPP-A normaux</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="vaccin-row">
+            <div class="vdot" style="background:var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Sage-femme — bilan S10</div>
+              <div style="font-size:11px;color:var(--grey)">Mme Durand · 5 mai · TA 11/7, poids +1,2kg, tout va bien</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+
+          <!-- RDV à venir -->
+          <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px">À venir</div>
+          <div class="vaccin-row" onclick="openPanel('rdv-echo')" style="cursor:pointer">
+            <div class="vdot" style="background:var(--amber-d)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Écho morphologique — S22</div>
+              <div style="font-size:11px;color:var(--grey)">Dr. Lemaire · 24 juin 2026 · 10h30</div>
+            </div>
+            <span class="pill pill-warn">J-22</span>
+          </div>
+          <div class="vaccin-row">
+            <div class="vdot" style="background:var(--border)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Sage-femme — bilan S18</div>
+              <div style="font-size:11px;color:var(--grey)">Mme Durand · à planifier</div>
+            </div>
+            <span class="pill" style="background:var(--grey-l);color:var(--grey)">À planif.</span>
+          </div>
+          <div class="vaccin-row">
+            <div class="vdot" style="background:var(--border)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">Test diabète gestationnel</div>
+              <div style="font-size:11px;color:var(--grey)">S24-28 · à planifier</div>
+            </div>
+            <span class="pill" style="background:var(--grey-l);color:var(--grey)">À venir</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courbe de poids Marie -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">⚖️ Poids de Marie</div><div class="card-link" style="color:var(--teal)" onclick="openPanel('add-mesure')">+ Mesure</div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <div style="flex:1;background:var(--teal-l);border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:18px;font-weight:700;color:var(--teal)">+2,8 kg</div>
+              <div style="font-size:10px;color:var(--grey)">Prise totale</div>
+            </div>
+            <div style="flex:1;background:var(--green-l);border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:18px;font-weight:700;color:var(--green)">Normal</div>
+              <div style="font-size:10px;color:var(--grey)">Vs courbe OMS</div>
+            </div>
+            <div style="flex:1;background:var(--blue-l);border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:18px;font-weight:700;color:var(--blue)">62 kg</div>
+              <div style="font-size:10px;color:var(--grey)">Poids actuel</div>
+            </div>
+          </div>
+          <!-- Mini chart -->
+          <div style="font-size:10px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Évolution (semaines)</div>
+          <div style="display:flex;align-items:flex-end;gap:5px;height:60px;padding:0 2px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="width:100%;background:var(--teal-l);border-radius:3px 3px 0 0;height:20%"></div>
+              <div style="font-size:8px;color:var(--grey)">S6</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="width:100%;background:var(--teal-l);border-radius:3px 3px 0 0;height:30%"></div>
+              <div style="font-size:8px;color:var(--grey)">S8</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="width:100%;background:var(--teal-l);border-radius:3px 3px 0 0;height:45%"></div>
+              <div style="font-size:8px;color:var(--grey)">S10</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="width:100%;background:var(--teal-l);border-radius:3px 3px 0 0;height:60%"></div>
+              <div style="font-size:8px;color:var(--grey)">S12</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="width:100%;background:var(--teal);border-radius:3px 3px 0 0;height:80%"></div>
+              <div style="font-size:8px;color:var(--teal);font-weight:700">S14</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--grey);margin-top:6px">Objectif à terme : +11 à +16 kg (recommandation OMS pour IMC normal)</div>
+        </div>
+      </div>
+
+      <!-- Infos médicales -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">🩸 Informations médicales</div><div class="card-link" style="color:var(--teal)" onclick="openPanel('edit-medical')">Modifier</div></div>
+        <div class="card-body">
+          <div class="row"><span class="rk">Groupe sanguin Marie</span><span class="rv">O+ <span class="pill pill-ok">Rhésus positif</span></span></div>
+          <div class="row"><span class="rk">Groupe sanguin Thomas</span><span class="rv">A+</span></div>
+          <div class="row"><span class="rk">Risque rhésus</span><span class="rv"><span class="pill pill-ok">Aucun</span></span></div>
+          <div class="row"><span class="rk">Allergies Marie</span><span class="rv">Pénicilline <span class="pill pill-red">⚠️</span></span></div>
+          <div class="row"><span class="rk">Compléments en cours</span><span class="rv">Acide folique 0,4mg · Vitamine D</span></div>
+          <div class="row"><span class="rk">Médecin référent</span><span class="rv">Dr. Lemaire · 01 42 XX XX XX</span></div>
+          <div class="row"><span class="rk">Maternité choisie</span><span class="rv">Port-Royal · Paris 14e</span></div>
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="openPanel('add-rdv')">+ Ajouter un rendez-vous médical</button>
+    </div>
+
+    <!-- ── DOCUMENTS ── -->
+    <div class="gmod" id="gm-docs" style="padding:14px">
+
+      <!-- Catégories -->
+      <div style="display:flex;gap:7px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px">
+        <div style="flex-shrink:0;padding:6px 14px;border-radius:20px;background:var(--teal);color:white;font-size:12px;font-weight:500;cursor:pointer">Tous (8)</div>
+        <div style="flex-shrink:0;padding:6px 14px;border-radius:20px;background:var(--grey-l);color:var(--grey);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border)">Santé (5)</div>
+        <div style="flex-shrink:0;padding:6px 14px;border-radius:20px;background:var(--grey-l);color:var(--grey);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border)">Admin (2)</div>
+        <div style="flex-shrink:0;padding:6px 14px;border-radius:20px;background:var(--grey-l);color:var(--grey);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border)">Assurance (1)</div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">🩺 Santé &amp; Médical</div></div>
+        <div class="card-body">
+          <div class="doc-row" onclick="openPanel('view-doc-sang')">
+            <div class="doc-ic" style="background:var(--red-l)">🩸</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Résultats prise de sang T1</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · 28 avril 2026 · Labo Cerba</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="doc-row" onclick="openPanel('view-doc-echo')">
+            <div class="doc-ic" style="background:var(--blue-l)">🔊</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">CR Écho T1 — Semaine 12</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · 28 avril · Dr. Lemaire</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="doc-row" onclick="openPanel('view-doc-sf')">
+            <div class="doc-ic" style="background:var(--green-l)">📋</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Bilan sage-femme S10</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · 5 mai · Mme Durand</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="doc-row" onclick="openPanel('view-doc-ordo')">
+            <div class="doc-ic" style="background:var(--amber-l)">💊</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Ordonnance Acide folique</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · 15 mars · Dr. Lemaire</div>
+            </div>
+            <span class="pill pill-ok">✓</span>
+          </div>
+          <div class="doc-row" style="opacity:.5" onclick="openPanel('attente-echo')">
+            <div class="doc-ic" style="background:var(--border)">⏳</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500;color:var(--grey)">CR Écho morphologique S22</div>
+              <div style="font-size:11px;color:var(--grey)">En attente — 24 juin 2026</div>
+            </div>
+            <span class="pill pill-warn">J-22</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">📋 Administratif</div></div>
+        <div class="card-body">
+          <div class="doc-row" onclick="openPanel('view-doc-dec')">
+            <div class="doc-ic" style="background:var(--purple-l)">📄</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Déclaration de grossesse CPAM</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · 20 mars · Envoyée</div>
+            </div>
+            <span class="pill pill-ok">Envoyé</span>
+          </div>
+          <div class="doc-row" onclick="openPanel('view-doc-conge')">
+            <div class="doc-ic" style="background:var(--navy)" style="background:rgba(27,58,92,.1)">💼</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Demande congé paternité</div>
+              <div style="font-size:11px;color:var(--grey)">Word · À envoyer à l'employeur</div>
+            </div>
+            <span class="pill pill-warn">À faire</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">🛡️ Assurance</div></div>
+        <div class="card-body">
+          <div class="doc-row" onclick="openPanel('view-doc-mutuelle')">
+            <div class="doc-ic" style="background:var(--green-l)">🏥</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">Attestation mutuelle grossesse</div>
+              <div style="font-size:11px;color:var(--grey)">PDF · Mutuelle MGEN · Valide</div>
+            </div>
+            <span class="pill pill-ok">Valide</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partage sécurisé -->
+      <div style="background:var(--navy);border-radius:16px;padding:16px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:6px">🔐 Partage sécurisé</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-bottom:12px;line-height:1.6">Partage un document vers un médecin, la crèche ou un proche — avec durée et révocation en 1 tap.</div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;cursor:pointer" onclick="openPanel('partage-actif')">
+            <div style="font-size:16px;font-weight:700;color:white">2</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6)">Partages actifs</div>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;cursor:pointer" onclick="openPanel('nouveau-partage')">
+            <div style="font-size:16px;font-weight:700;color:var(--amber)">+</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6)">Nouveau partage</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="openPanel('add-doc')">+ Ajouter un document</button>
+    </div>
+
+    <!-- ── CHECKLISTS ── -->
+    <div class="gmod" id="gm-checklists" style="padding:14px">
+
+      <!-- Générateur IA -->
+      <div style="background:linear-gradient(135deg,var(--teal),#0A5242);border-radius:18px;padding:18px;margin-bottom:14px;cursor:pointer" onclick="openPanel('gen-check')">
+        <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">✨ Généré par l'IA · Adapté à S14</div>
+        <div style="font-family:Playfair Display,serif;font-size:17px;color:white;font-weight:600;margin-bottom:12px">Créer une nouvelle checklist</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:11px;color:white">🏥 Valise maternité</span>
+          <span style="background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:11px;color:white">🏠 Chambre bébé</span>
+          <span style="background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:11px;color:white">📋 Admin naissance</span>
+          <span style="background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:11px;color:white">✈️ Voyage</span>
+        </div>
+      </div>
+
+      <!-- Valise maternité -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd">
+          <div class="card-title">🏥 Valise maternité</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:12px;font-weight:600;color:var(--teal)" id="ck-prog-val">4 / 14</div>
+            <div class="card-link" style="color:var(--grey)" onclick="openPanel('share-check')">Partager</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden">
+            <div style="height:100%;background:var(--teal);border-radius:2px;width:28.5%" id="ck-bar-val"></div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Documents</div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'val')"><div class="ck-box">✓</div><div class="ck-text">Carte vitale + attestation mutuelle</div></div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'val')"><div class="ck-box">✓</div><div class="ck-text">Pièce d'identité (x2)</div></div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'val')"><div class="ck-box">✓</div><div class="ck-text">Carnet de maternité + ordonnances</div></div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'val')"><div class="ck-box">✓</div><div class="ck-text">Plan de naissance signé</div></div>
+          <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Pour bébé</div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">3 bodies manches longues (taille NB)</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Pyjamas pieds fermés x3</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Gigoteuse 0,5 tog</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Siège auto installé et vérifié ⚠️</div></div>
+          <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Pour toi</div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Affaires 3 jours (vêtements, nécessaire)</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Chargeurs + batterie externe</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Snacks + bouteilles d'eau</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Appareil photo + carte SD</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'val')"><div class="ck-box"></div><div class="ck-text">Numéros utiles notés (sages-femmes, parents)</div></div>
+        </div>
+      </div>
+
+      <!-- Chambre bébé -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd">
+          <div class="card-title">🏠 Chambre bébé</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:12px;font-weight:600;color:var(--amber-d)" id="ck-prog-ch">2 / 10</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden">
+            <div style="height:100%;background:var(--amber);border-radius:2px;width:20%" id="ck-bar-ch"></div>
+          </div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'ch')"><div class="ck-box">✓</div><div class="ck-text">Lit à barreaux avec matelas ferme</div></div>
+          <div class="ck-item done" onclick="toggleCkGroup(this,'ch')"><div class="ck-box">✓</div><div class="ck-text">Table à langer avec protection</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Thermomètre de chambre (objectif 18-19°C)</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Veilleuse sans lumière bleue</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Machine à bruit blanc</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Babyphone vidéo</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Commode avec espace change</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Rocking chair ou fauteuil d'allaitement</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Gigoteuse 2,5 tog (hiver) + 0,5 tog (été)</div></div>
+          <div class="ck-item" onclick="toggleCkGroup(this,'ch')"><div class="ck-box"></div><div class="ck-text">Cache-prises + sécurité tiroirs</div></div>
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="openPanel('gen-check')">✨ Générer une nouvelle checklist</button>
+    </div>
+
+    <!-- ── CO-PARENT ── -->
+    <div class="gmod" id="gm-coparent" style="padding:14px">
+
+      <!-- Info banner -->
+      <div style="background:var(--blue-l);border:1px solid rgba(43,108,176,.2);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
+        <div style="font-size:18px;flex-shrink:0">ℹ️</div>
+        <div style="font-size:12px;color:var(--blue);line-height:1.6">Fiche d'urgence de Marie — accessible en un geste si besoin médical. Le partage d'accès complet à l'app arrivera en Phase 2.</div>
+      </div>
+
+      <!-- Profil Marie -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-m));display:flex;align-items:center;justify-content:center;font-size:20px">👩</div>
+            <div><div class="card-title">Marie Dupont</div><div style="font-size:11px;color:var(--grey)">Co-parent · En couple</div></div>
+          </div>
+          <div class="card-link" style="color:var(--teal)" onclick="openPanel('edit-coparent')">Modifier</div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <span class="rk">Téléphone</span>
+            <span class="rv" style="color:var(--blue);cursor:pointer" onclick="showToast('Appel simulé — 06 12 34 56 78')">📞 06 12 34 56 78</span>
+          </div>
+          <div class="row"><span class="rk">Email</span><span class="rv">marie@exemple.com</span></div>
+          <div class="row"><span class="rk">Groupe sanguin</span><span class="rv">O+ <span class="pill pill-ok">Rhésus positif</span></span></div>
+          <div class="row"><span class="rk">Allergies</span><span class="rv">Pénicilline <span class="pill pill-red">⚠️</span></span></div>
+          <div class="row"><span class="rk">Médicaments</span><span class="rv">Acide folique 0,4mg · Vitamine D3</span></div>
+          <div class="row"><span class="rk">Médecin traitant</span><span class="rv">Dr. Dubois · 01 45 XX XX XX</span></div>
+          <div class="row"><span class="rk">Mutuelle</span><span class="rv">MGEN · N° 123 456 789</span></div>
+        </div>
+      </div>
+
+      <!-- Contacts urgence -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">🚨 Contacts d'urgence</div><div class="card-link" style="color:var(--teal)" onclick="openPanel('edit-urgence')">Modifier</div></div>
+        <div class="card-body">
+          <div class="row">
+            <span class="rk">SAMU</span>
+            <span class="rv" style="color:var(--red);font-weight:700;font-size:18px;cursor:pointer" onclick="window.location.href='tel:15'">15</span>
+          </div>
+          <div class="row">
+            <span class="rk">Maternité Port-Royal</span>
+            <span class="rv" style="color:var(--blue);cursor:pointer" onclick="showToast('Appel maternité simulé')">📞 01 58 41 41 41</span>
+          </div>
+          <div class="row">
+            <span class="rk">Parents de Marie</span>
+            <span class="rv" style="color:var(--blue);cursor:pointer" onclick="showToast('Appel simulé')">📞 06 98 76 54 32</span>
+          </div>
+          <div class="row">
+            <span class="rk">Parents de Thomas</span>
+            <span class="rv" style="color:var(--blue);cursor:pointer" onclick="showToast('Appel simulé')">📞 06 11 22 33 44</span>
+          </div>
+          <div class="row">
+            <span class="rk">Gynécologue urgences</span>
+            <span class="rv" style="color:var(--blue);cursor:pointer" onclick="showToast('Appel simulé')">📞 Dr. Lemaire · 06 XX XX XX XX</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Protocoles urgence -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd"><div class="card-title">⚕️ Protocoles d'urgence</div></div>
+        <div class="card-body">
+          <div class="doc-row" onclick="openPanel('proto-contraction')">
+            <div class="doc-ic" style="background:var(--red-l)">🕐</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Contractions — quand partir ?</div><div style="font-size:11px;color:var(--grey)">Règle 5-1-1 expliquée</div></div>
+            <div style="font-size:16px;color:var(--grey)">›</div>
+          </div>
+          <div class="doc-row" onclick="openPanel('proto-eau')">
+            <div class="doc-ic" style="background:var(--blue-l)">💧</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Perte des eaux — quoi faire</div><div style="font-size:11px;color:var(--grey)">Protocole pas-à-pas</div></div>
+            <div style="font-size:16px;color:var(--grey)">›</div>
+          </div>
+          <div class="doc-row" onclick="openPanel('proto-allergie')">
+            <div class="doc-ic" style="background:var(--amber-l)">⚠️</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500">Allergie pénicilline — à signaler</div><div style="font-size:11px;color:var(--grey)">Information pour les soignants</div></div>
+            <div style="font-size:16px;color:var(--grey)">›</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="ni" onclick="goTab('compte','#1B3A5C')"><div class="ni-icon">👤</div><div class="ni-label">Compte</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    <div class="ni active" onclick="goTab('grimoire','#0F6E56')"><div class="ni-icon">📖</div><div class="ni-label" style="color:var(--teal)">Grimoire</div><div class="ni-dot" style="background:var(--teal);opacity:1"></div></div>
+    <div class="ni" onclick="goTab('ia','#3C3489')"><div class="ni-icon">🤖</div><div class="ni-label">IA</div><div class="ni-dot" style="background:var(--purple)"></div></div>
+    <div class="ni" onclick="goTab('brief','#1B3A5C')"><div class="ni-icon">🧠</div><div class="ni-label">Brief</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    <div class="ni" onclick="openPanel('community')"><div class="ni-icon">👥</div><div class="ni-label">Communauté</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+  </div>
+</div>
+
+<!-- IA -->
+<div class="screen" id="sc-ia">
+  <div class="hd" style="background:var(--purple);padding-bottom:14px">
+    <div class="hd-top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;animation:breathe 3s ease infinite">🤖</div>
+        <div><div style="font-size:15px;font-weight:600;color:white">IA ToBeFather</div><div style="font-size:12px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:5px"><div style="width:6px;height:6px;border-radius:50%;background:#48BB78"></div>Disponible 24h/24</div></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="hd-btn" style="font-size:15px" onclick="openPanel('ia-hist')">🕐</div>
+        <div class="hd-btn" style="font-size:15px" onclick="openPanel('ia-ctx')">👶</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:6px 14px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openPanel('ia-ctx')">
+      <span style="font-size:12px;color:rgba(255,255,255,.8)">🤰 Thomas · Grossesse semaine 14</span>
+      <span style="background:rgba(246,173,85,.2);color:var(--amber);font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;margin-left:auto">S14</span>
+    </div>
+  </div>
+  <div class="sugg-row">
+    <div class="schip" onclick="sendQ('L\'écho morphologique approche — quelles questions poser ?')"><span>🔊</span><span>Écho S22 — questions à poser</span></div>
+    <div class="schip" onclick="sendQ('Marie a des nausées depuis 3 jours, c\'est normal à S14 ?')"><span>🤢</span><span>Nausées à S14</span></div>
+    <div class="schip" onclick="sendQ('Que dois-je préparer cette semaine ?')"><span>📋</span><span>Cette semaine</span></div>
+    <div class="schip" onclick="sendQ('Comment soutenir Marie pendant la grossesse ?')"><span>❤️</span><span>Soutenir Marie</span></div>
+    <div class="schip" onclick="sendQ('Quels documents dois-je préparer avant la naissance ?')"><span>📄</span><span>Documents à préparer</span></div>
+  </div>
+  <div class="chat-area" id="chat-area">
+    <div style="display:flex;align-items:center;gap:8px;margin:2px 0 8px"><div style="flex:1;height:1px;background:var(--border)"></div><div style="font-size:11px;color:var(--grey)">Aujourd'hui</div><div style="flex:1;height:1px;background:var(--border)"></div></div>
+    <div class="bw ai">
+      <div class="bav ai">🤖</div>
+      <div><div class="bub ai"><div>Salut Thomas 👋<br><br>Marie est en semaine 14 — vous êtes au début du 2ème trimestre, la période la plus agréable de la grossesse pour beaucoup de couples.<br><br>Qu'est-ce que je peux faire pour toi aujourd'hui ?</div><div class="bub-time">9:41</div></div></div>
+    </div>
+  </div>
+  <div class="cbar">
+    <div style="font-size:11px;color:var(--grey)" id="ia-ctr">⚡ 5 questions restantes (offre gratuite)</div>
+    <div style="font-size:11px;font-weight:600;color:var(--purple);cursor:pointer" onclick="openPanel('premium')">Premium →</div>
+  </div>
+  <div class="ia-input-area">
+    <textarea class="ia-input" id="ia-inp" placeholder="Pose ta question…" rows="1" onkeydown="iaKey(event)" oninput="iaResize(this)"></textarea>
+    <button class="send" onclick="sendFromInput()"><svg viewBox="0 0 24 24"><path d="M2 12L22 2L14 22L11 13L2 12Z"/></svg></button>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="goTab('compte','#1B3A5C')"><div class="ni-icon">👤</div><div class="ni-label">Compte</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    <div class="ni" onclick="goTab('grimoire','#0F6E56')"><div class="ni-icon">📖</div><div class="ni-label">Grimoire</div><div class="ni-dot" style="background:var(--teal)"></div></div>
+    <div class="ni active" onclick="goTab('ia','#3C3489')"><div class="ni-icon">🤖</div><div class="ni-label" style="color:var(--purple)">IA</div><div class="ni-dot" style="background:var(--purple);opacity:1"></div></div>
+    <div class="ni" onclick="goTab('brief','#1B3A5C')"><div class="ni-icon">🧠</div><div class="ni-label">Brief</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    <div class="ni" onclick="openPanel('community')"><div class="ni-icon">👥</div><div class="ni-label">Communauté</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+  </div>
+</div>
+
+<!-- BRIEF -->
+<div class="screen" id="sc-brief">
+  <div id="brief-cat" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="hd" style="background:var(--navy)">
+      <div class="hd-top"><div><div class="hd-title">🧠 Le Brief</div><div class="hd-sub">Ta roadmap personnalisée · Grossesse</div></div><div style="text-align:right"><div style="font-size:10px;color:rgba(255,255,255,.5)">Complétés</div><div style="font-size:20px;font-weight:700;color:white">3 <span style="font-size:13px;opacity:.4">/ 20</span></div></div></div>
+      <div class="xp-card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--amber)">Nv1 — Père en devenir 🌱</span><span style="font-size:11px;color:rgba(255,255,255,.5)">280 / 1000 XP</span></div><div class="xp-track"><div class="xp-fill"></div></div></div>
+    </div>
+    <div class="phase-filter">
+      <div class="phase-pill active" onclick="filterB(this,'all')">Tous</div>
+      <div class="phase-pill" onclick="filterB(this,'grossesse')">🤰 Grossesse</div>
+      <div class="phase-pill" onclick="filterB(this,'accouch')">🏥 Accouchement</div>
+      <div class="phase-pill" onclick="filterB(this,'0_3')">👶 0-3 mois</div>
+    </div>
+    <div class="body" style="padding:14px" id="brief-list">
+      <div class="phase-sep" data-g="grossesse">Grossesse — En cours</div>
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')"><div class="mod-ic" style="background:var(--green-l)">🌱</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">L'envie d'avoir un enfant</div><div style="font-size:11px;color:var(--green)">✓ Complété · +80 XP</div></div><div class="mod-st" style="background:var(--green-l)">✓</div></div>
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')"><div class="mod-ic" style="background:var(--green-l)">🧬</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Comprendre le développement fœtal</div><div style="font-size:11px;color:var(--green)">✓ Complété · +100 XP</div></div><div class="mod-st" style="background:var(--green-l)">✓</div></div>
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')"><div class="mod-ic" style="background:var(--green-l)">🔊</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Mon rôle aux échographies</div><div style="font-size:11px;color:var(--green)">✓ Complété · +80 XP</div></div><div class="mod-st" style="background:var(--green-l)">✓</div></div>
+      <div class="mod-card current" data-g="grossesse" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--amber-l)">🏠</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Préparer la chambre — check technique</div><div style="font-size:11px;color:var(--amber-d);font-weight:600">En cours · +100 XP</div></div><div class="mod-st" style="background:var(--amber-l)">▶</div></div>
+      <div class="mod-card" data-g="grossesse" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--blue-l)">💑</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Soutenir la partenaire — ce qui marche vraiment</div><div style="font-size:11px;color:var(--grey)">8 min · +80 XP</div></div><div class="mod-st" style="background:var(--blue-l)">→</div></div>
+      <div class="mod-card" data-g="grossesse" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--blue-l)">📋</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Construire le plan de naissance</div><div style="font-size:11px;color:var(--grey)">9 min · +100 XP</div></div><div class="mod-st" style="background:var(--blue-l)">→</div></div>
+      <div class="mod-card" data-g="grossesse" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--blue-l)">⚖️</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Congé paternité — droits et optimisation</div><div style="font-size:11px;color:var(--grey)">8 min · +80 XP</div></div><div class="mod-st" style="background:var(--blue-l)">→</div></div>
+      <div class="phase-sep" data-g="accouch">Accouchement — À venir</div>
+      <div class="mod-card" data-g="accouch" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--blue-l)">🏥</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Les 72h à la maternité — protocole père</div><div style="font-size:11px;color:var(--grey)">12 min · +120 XP</div></div><div class="mod-st" style="background:var(--blue-l)">→</div></div>
+      <div class="mod-card" data-g="accouch" onclick="openModule('chambre')"><div class="mod-ic" style="background:var(--blue-l)">💪</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Rester ancré pendant l'accouchement</div><div style="font-size:11px;color:var(--grey)">10 min · +100 XP</div></div><div class="mod-st" style="background:var(--blue-l)">→</div></div>
+      <div class="phase-sep" data-g="0_3">0-3 mois — Prochainement</div>
+      <div class="mod-card locked" data-g="0_3"><div class="mod-ic" style="background:var(--border)">😭</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--grey);margin-bottom:3px">Décoder les pleurs — les 5 signaux</div><div style="font-size:11px;color:var(--grey)">Disponible à la naissance</div></div><div class="mod-st" style="background:var(--border)">🔒</div></div>
+      <div class="mod-card locked" data-g="0_3"><div class="mod-ic" style="background:var(--border)">🛁</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--grey);margin-bottom:3px">Le bain du nourrisson</div><div style="font-size:11px;color:var(--grey)">Disponible à la naissance</div></div><div class="mod-st" style="background:var(--border)">🔒</div></div>
+    </div>
+    <div class="nav">
+      <div class="ni" onclick="goTab('compte','#1B3A5C')"><div class="ni-icon">👤</div><div class="ni-label">Compte</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+      <div class="ni" onclick="goTab('grimoire','#0F6E56')"><div class="ni-icon">📖</div><div class="ni-label">Grimoire</div><div class="ni-dot" style="background:var(--teal)"></div></div>
+      <div class="ni" onclick="goTab('ia','#3C3489')"><div class="ni-icon">🤖</div><div class="ni-label">IA</div><div class="ni-dot" style="background:var(--purple)"></div></div>
+      <div class="ni active" onclick="goTab('brief','#1B3A5C')"><div class="ni-icon">🧠</div><div class="ni-label" style="color:var(--navy)">Brief</div><div class="ni-dot" style="background:var(--navy);opacity:1"></div></div>
+      <div class="ni" onclick="openPanel('community')"><div class="ni-icon">👥</div><div class="ni-label">Communauté</div><div class="ni-dot" style="background:var(--navy)"></div></div>
+    </div>
+  </div>
+
+  <!-- READER -->
+  <div id="brief-reader" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="reader-hd">
+      <div class="reader-top"><button class="ob-back" onclick="closeReader()">←</button><div style="font-size:12px;color:rgba(255,255,255,.5)" id="r-lbl">Étape 1 / 6</div><div style="width:36px"></div></div>
+      <div id="r-mod-name" style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Préparer la chambre de bébé</div>
+      <div class="sdots" id="r-dots"></div>
+    </div>
+    <div class="body" style="padding:18px 20px 0" id="r-body"></div>
+    <div style="padding:14px 20px 20px;background:white;border-top:1px solid var(--border);flex-shrink:0"><button class="btn btn-navy" id="r-btn" onclick="nextStep()">Continuer →</button></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="brief-quiz" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="reader-hd">
+      <div class="reader-top"><button class="ob-back" onclick="showBriefView('reader')">←</button><div style="font-size:12px;color:rgba(255,255,255,.5)" id="q-lbl">Question 1 / 8</div><div style="width:36px"></div></div>
+      <div style="font-size:14px;font-weight:600;color:white;margin-bottom:10px">Quiz de validation 🎯</div>
+      <div class="sdots" id="q-dots"></div>
+    </div>
+    <div class="body" style="padding:18px 20px" id="q-body"></div>
+    <div style="padding:14px 20px 20px;background:white;border-top:1px solid var(--border);flex-shrink:0"><button class="btn btn-navy" id="q-btn" onclick="nextQuiz()" disabled style="opacity:.4">Valider →</button></div>
+  </div>
+
+  <!-- BADGE -->
+  <div id="brief-badge" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="badge-screen">
+      <div class="badge-ring" id="b-icon">🏠</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:white;margin-bottom:8px" id="b-name">Chef Logistique</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:22px;max-width:280px" id="b-desc">La chambre est prête. Léo arrive dans un environnement sécurisé et pensé.</div>
+      <div style="background:rgba(246,173,85,.15);border:1px solid rgba(246,173,85,.3);border-radius:20px;padding:8px 20px;display:inline-flex;align-items:center;gap:8px;margin-bottom:28px"><span style="font-size:18px">⚡</span><span style="font-size:14px;font-weight:600;color:var(--amber)" id="b-xp">+100 XP</span></div>
+    </div>
+    <div class="badge-foot">
+      <button class="btn btn-amber" onclick="closeReader()" style="margin-bottom:10px">Retour au catalogue →</button>
+      <button class="btn btn-ghost" onclick="closeReader()">Voir mon profil</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+</div><!-- /wrap -->
+
+<script>
+// ═══ SUPABASE INIT ═══
+const SUPABASE_URL = "https://ogpfshjtchfxzbpqhtwb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ncGZzaGp0Y2hmeHpicHFodHdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NzgwMTgsImV4cCI6MjA5NjA1NDAxOH0.LmsJAuxJ5jnLCsxIcTjS6C_6_R0VuZJ1ZphxQcXiO-4";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ═══ AUTH ═══
+async function signUp(email, password, prenom) {
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) throw error;
+  if (data.user) {
+    await sb.from('profiles_pere').upsert({
+      user_id: data.user.id,
+      prenom: prenom || 'Thomas',
+      onboarding_done: true
+    });
+  }
+  return data;
+}
+
+async function signIn(email, password) {
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+async function getSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  return session;
+}
+
+async function getCurrentUser() {
+  const { data: { user } } = await sb.auth.getUser();
+  return user;
+}
+
+// ═══ PROFIL ═══
+async function loadProfil() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const { data } = await sb.from('profiles_pere').select('*').eq('user_id', user.id).single();
+  return data;
+}
+
+async function saveProfil(updates) {
+  const user = await getCurrentUser();
+  if (!user) return;
+  await sb.from('profiles_pere').upsert({ user_id: user.id, ...updates, updated_at: new Date().toISOString() });
+}
+
+// ═══ ENFANTS ═══
+async function loadEnfant() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const { data } = await sb.from('enfants').select('*').eq('user_id', user.id).eq('est_actif', true).single();
+  return data;
+}
+
+async function saveEnfant(enfantData) {
+  const user = await getCurrentUser();
+  if (!user) return;
+  const { data } = await sb.from('enfants').upsert({ user_id: user.id, ...enfantData }).select().single();
+  return data;
+}
+
+// ═══ CONVERSATIONS IA ═══
+async function createConversation() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const { data } = await sb.from('conversations_ia').insert({ user_id: user.id }).select().single();
+  return data;
+}
+
+async function saveMessage(convId, role, contenu) {
+  if (!convId) return;
+  await sb.from('messages_ia').insert({ conversation_id: convId, role, contenu });
+  await sb.from('conversations_ia').update({ updated_at: new Date().toISOString() }).eq('id', convId);
+}
+
+async function loadConversations() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data } = await sb.from('conversations_ia').select('*').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(10);
+  return data || [];
+}
+
+// ═══ MODULES PROGRESS ═══
+async function saveModuleProgress(moduleSlug, statut, scoreQuiz) {
+  const user = await getCurrentUser();
+  if (!user) return;
+  // Find module id by slug
+  const { data: mod } = await sb.from('modules_brief').select('id, xp_reward').eq('slug', moduleSlug).single();
+  if (!mod) return;
+  await sb.from('modules_progress').upsert({
+    user_id: user.id,
+    module_id: mod.id,
+    statut,
+    score_quiz: scoreQuiz,
+    completed_at: statut === 'complete' ? new Date().toISOString() : null
+  }, { onConflict: 'user_id,module_id' });
+  if (statut === 'complete') {
+    const profil = await loadProfil();
+    if (profil) {
+      await saveProfil({ xp_total: (profil.xp_total || 0) + mod.xp_reward });
+    }
+  }
+}
+
+// ═══ GRIMOIRE ═══
+async function saveInventaireItem(enfantId, item) {
+  await sb.from('inventaire_items').upsert({ enfant_id: enfantId, ...item, updated_at: new Date().toISOString() });
+}
+
+async function loadInventaire(enfantId) {
+  const { data } = await sb.from('inventaire_items').select('*').eq('enfant_id', enfantId);
+  return data || [];
+}
+
+async function saveVaccin(enfantId, vaccin) {
+  await sb.from('vaccins').insert({ enfant_id: enfantId, ...vaccin });
+}
+
+async function saveRDV(enfantId, rdv) {
+  await sb.from('rdv_medicaux').insert({ enfant_id: enfantId, ...rdv });
+}
+
+// ═══ INIT APP ═══
+async function initApp() {
+  try {
+    const session = await getSession();
+    if (session) {
+      // Utilisateur déjà connecté — charger son profil
+      const profil = await loadProfil();
+      if (profil) {
+        PROFIL.pere.prenom = profil.prenom || 'Thomas';
+        document.getElementById('compte-name').textContent = PROFIL.pere.prenom;
+        if (profil.xp_total) {
+          document.querySelector('.xp-fill').style.width = Math.min(100, (profil.xp_total / 1000) * 100) + '%';
+        }
+      }
+      // Aller directement à l'IA si déjà onboardé
+      if (profil?.onboarding_done) {
+        document.getElementById('sc-onboarding').classList.remove('active');
+        document.getElementById('sc-onboarding').style.display = 'none';
+        document.getElementById('sc-ia').classList.add('active');
+        document.getElementById('sb').style.background = 'var(--purple)';
+        showToast('Bon retour ' + PROFIL.pere.prenom + ' 👋');
+      }
+    }
+  } catch(e) {
+    console.log('Init app:', e.message);
+  }
+}
+
+// ═══ PROFIL DÉMO ═══
+const PROFIL = {
+  pere: { prenom:'Thomas', situation:'grossesse', sem:14 },
+  partenaire: { prenom:'Marie', terme:'15 octobre 2026' },
+  contexte: 'Thomas, ton partenaire Marie est en semaine 14 de grossesse. C\'est le 2ème trimestre, une période clé. Terme prévu le 15 octobre 2026. Prochaine échographie : morphologique à la semaine 22 (dans 8 semaines). Prise de poids de Marie : +2,8kg (normal). Groupe sanguin Marie : O+. Médecin : Dr. Lemaire. Groupe sanguin Thomas : A+. Pas d\'allergies connues chez Thomas.'
+};
+
+// ═══ NAV ═══
+function goTab(tab, color) {
+  // Hide ALL screens including onboarding
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const target = document.getElementById('sc-'+tab);
+  if(target) { target.classList.add('active'); target.style.display = 'flex'; }
+  document.getElementById('sb').style.background = color;
+  closePanel();
+}
+
+// ═══ ONBOARDING ═══
+const obState = { situation:'grossesse' };
+let slideTimer = null;
+
+function selOb(el, key, val) {
+  el.closest('.ob-choices').querySelectorAll('.ob-choice').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  obState[key] = val;
+}
+
+function selOpt(el, group) {
+  el.closest('.ob-body, .field').querySelectorAll('[data-val]').forEach(c => {
+    if(c !== el) c.classList.remove('sel');
+  });
+  el.classList.toggle('sel');
+}
+
+function goOb(id) {
+  document.querySelectorAll('.ob').forEach(o => { o.classList.remove('active'); o.style.display='none'; });
+  const t = document.getElementById(id);
+  t.style.display = 'flex';
+  setTimeout(() => t.classList.add('active'), 10);
+}
+
+function finishOnboarding() {
+  const prenom = document.getElementById('inp-prenom')?.value || 'Thomas';
+  document.getElementById('compte-name').textContent = prenom;
+  PROFIL.pere.prenom = prenom;
+  const ob = document.getElementById('sc-onboarding'); ob.classList.remove('active'); ob.style.display='none';
+  document.getElementById('sc-ia').classList.add('active');
+  document.getElementById('sb').style.background = 'var(--purple)';
+  showToast('Bienvenue ' + prenom + ' ! L\'IA est prête 🎉');
+}
+
+// Init onboarding display
+document.getElementById('ob-splash').style.display = 'flex';
+
+// ═══ GRIMOIRE ═══
+function switchGrim(id, tab) {
+  document.querySelectorAll('.gmod').forEach(m => m.classList.remove('active'));
+  document.getElementById('gm-'+id).classList.add('active');
+  document.querySelectorAll('.gtab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+}
+
+function toggleCk(item) {
+  item.classList.toggle('done');
+  item.querySelector('.ck-box').textContent = item.classList.contains('done') ? '✓' : '';
+}
+
+function toggleCkGroup(item, group) {
+  item.classList.toggle('done');
+  item.querySelector('.ck-box').textContent = item.classList.contains('done') ? '✓' : '';
+  updateCkProgress(group);
+}
+
+function updateCkProgress(group) {
+  const groups = {
+    'val': { prog:'ck-prog-val', bar:'ck-bar-val' },
+    'ch': { prog:'ck-prog-ch', bar:'ck-bar-ch' }
+  };
+  const g = groups[group];
+  if (!g) return;
+  const card = document.getElementById('ck-bar-' + group)?.closest('.card');
+  if (!card) return;
+  const items = card.querySelectorAll('.ck-item');
+  const done = card.querySelectorAll('.ck-item.done').length;
+  const pct = Math.round((done / items.length) * 100);
+  const prog = document.getElementById(g.prog);
+  const bar = document.getElementById(g.bar);
+  if (prog) prog.textContent = done + ' / ' + items.length;
+  if (bar) bar.style.width = pct + '%';
+}
+
+// ═══ IA CHAT ═══
+let iaCount = 5;
+let iaTyping = false;
+let iaHistory = [];
+const URGENCE = ['convulsions','convulsion','ne respire','inconscient','cyanose'];
+const SALUTS = ['salut','bonjour','hello','coucou','bonsoir','hey','yo'];
+const MERCIS = ['merci','thanks','super','top','parfait','nickel'];
+
+function buildSystemPrompt() {
+  return 'Tu es l\'IA ToBeFather, le copilote de paternité de Thomas.\n\n' +
+    'CONTEXTE : ' + PROFIL.contexte + '\n\n' +
+    'RÈGLES :\n' +
+    '1. Tu informes, tu ne diagnostiques JAMAIS.\n' +
+    '2. Ton : direct, concret, entre pairs. Pas condescendant.\n' +
+    '3. Pas de "C\'est tout à fait normal de ressentir..." — donne des infos actionnables.\n' +
+    '4. 150 mots max sauf si la question est complexe.\n' +
+    '5. Réponds en français uniquement.\n' +
+    '6. Tu peux suggérer des modules Brief ou des actions dans le Grimoire quand pertinent.\n' +
+    '7. Pour les symptômes : inclure "Consulte un médecin si..." à la fin.';
+}
+
+function sendQ(txt) { document.getElementById('ia-inp').value = txt; sendFromInput(); }
+
+async function sendFromInput() {
+  const inp = document.getElementById('ia-inp');
+  const txt = inp.value.trim();
+  if (!txt || iaTyping) return;
+  const lower = txt.toLowerCase();
+  if (URGENCE.some(k => lower.includes(k))) { inp.value=''; addUserBub(txt); addUrgBub(); return; }
+  if (iaCount <= 0) { openPanel('premium'); return; }
+  inp.value=''; inp.style.height='auto';
+  iaCount--; updateCtr(); iaTyping=true;
+  addUserBub(txt);
+  iaHistory.push({role:'user',content:txt});
+  if (SALUTS.some(k => lower===k||lower.startsWith(k+' ')||lower.startsWith(k+'!'))) {
+    await sleep(500);
+    const r='Salut '+PROFIL.pere.prenom+' ! Marie et toi êtes en semaine 14 — une belle période. Qu\'est-ce que je peux faire pour toi ?';
+    addSimpleBub(r); iaHistory.push({role:'assistant',content:r}); iaTyping=false; return;
+  }
+  if (MERCIS.some(k => lower.includes(k))) {
+    await sleep(400);
+    const r='Avec plaisir ! Si tu as d\'autres questions, je suis là.';
+    addSimpleBub(r); iaHistory.push({role:'assistant',content:r}); iaTyping=false; return;
+  }
+  showTyping();
+  try { await callClaude(); } catch(e) { hideTyping(); addSimpleBub('Une erreur est survenue. Réessaie dans quelques secondes.'); iaTyping=false; }
+}
+
+async function callClaude() {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:buildSystemPrompt(),
+      messages:iaHistory.slice(-20),
+      stream:true
+    })
+  });
+  if(!resp.ok) throw new Error(resp.status);
+  hideTyping();
+  const time = new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0');
+  const wrap = document.createElement('div'); wrap.className='bw ai';
+  wrap.innerHTML='<div class="bav ai">🤖</div><div><div class="bub ai"><div id="stream-txt"></div><div class="disc">🔒 Je ne remplace pas un avis médical</div><div class="bub-time">'+time+'</div></div></div>';
+  document.getElementById('chat-area').appendChild(wrap); scrollChat();
+  const el=document.getElementById('stream-txt'); let full='';
+  const reader=resp.body.getReader(); const dec=new TextDecoder();
+  while(true) {
+    const {done,value}=await reader.read(); if(done) break;
+    for(const line of dec.decode(value).split('\n')) {
+      if(line.startsWith('data: ')) {
+        try { const d=JSON.parse(line.slice(6)); if(d.delta?.text){full+=d.delta.text; el.innerHTML=full.replace(/\n/g,'<br>'); scrollChat();} } catch(e){}
+      }
+    }
+  }
+  el.id=''; iaHistory.push({role:'assistant',content:full}); iaTyping=false;
+}
+
+function addUserBub(txt) {
+  const time=new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0');
+  const w=document.createElement('div'); w.className='bw user';
+  w.innerHTML='<div class="bav user">👨</div><div><div class="bub user"><div>'+txt+'</div><div class="bub-time">'+time+'</div></div></div>';
+  document.getElementById('chat-area').appendChild(w); scrollChat();
+}
+function addSimpleBub(txt) {
+  hideTyping();
+  const time=new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0');
+  const w=document.createElement('div'); w.className='bw ai';
+  w.innerHTML='<div class="bav ai">🤖</div><div><div class="bub ai"><div>'+txt+'</div><div class="bub-time">'+time+'</div></div></div>';
+  document.getElementById('chat-area').appendChild(w); scrollChat();
+}
+function addUrgBub() {
+  const w=document.createElement('div'); w.className='bw ai';
+  w.innerHTML='<div class="bav ai">🤖</div><div><div class="bub urgence"><div style="white-space:pre-line">🚨 URGENCE\n\nAppelle le 15 maintenant.\n\nEn attendant :\n→ Allonge sur le côté\n→ Ne mets rien dans la bouche\n→ Note l\'heure de début</div><div style="display:flex;gap:8px;margin-top:10px"><button onclick="window.location.href=\'tel:15\'" style="flex:1;padding:9px;background:white;color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer">📞 Appeler le 15</button><button onclick="window.location.href=\'tel:18\'" style="flex:1;padding:9px;background:rgba(255,255,255,.2);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer">🚒 Appeler le 18</button></div></div></div>';
+  document.getElementById('chat-area').appendChild(w); scrollChat();
+}
+function showTyping() {
+  const w=document.createElement('div'); w.className='bw ai'; w.id='typer';
+  w.innerHTML='<div class="bav ai">🤖</div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  document.getElementById('chat-area').appendChild(w); scrollChat();
+}
+function hideTyping() { const t=document.getElementById('typer'); if(t) t.remove(); }
+function updateCtr() {
+  const el=document.getElementById('ia-ctr');
+  el.textContent=iaCount>0?'⚡ '+iaCount+' question'+(iaCount>1?'s':'')+' restante'+(iaCount>1?'s':'')+' (offre gratuite)':'🔒 Limite atteinte — Premium pour continuer';
+}
+function scrollChat() { setTimeout(()=>{ const a=document.getElementById('chat-area'); a.scrollTop=a.scrollHeight; },50); }
+function iaKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendFromInput();} }
+function iaResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// ═══ BRIEF ═══
+const MODULES_DATA = {
+  'chambre': {
+    title: 'Préparer la chambre de bébé',
+    phase: 'Grossesse · S14', duration: '10 min', xp: 100,
+    badge: { icon: '🏠', name: 'Chef Logistique', desc: 'La chambre est prête. Bébé arrive dans un environnement sécurisé.' },
+    steps: [
+      { tag:'Concept', tc:'background:#EBF4FF;color:#2B6CB0', title:'La chambre — ton domaine d\'expertise', body:'Préparer la chambre de bébé, c\'est concret, mesurable et 100% dans tes mains. C\'est l\'un des rares espaces où le père peut prendre les choses en main dès la grossesse — sans attendre.' },
+      { tag:'Pourquoi ça compte', tc:'background:#FEF3E0;color:#C47B1E', title:'Être prêt à J-30, pas à J-1', body:'Les familles qui n\'ont pas préparé la maison vivent leurs premières heures dans le chaos logistique. La chambre prête = esprit libre pour profiter de l\'arrivée de bébé.' },
+      { tag:'La liste', tc:'background:#EBF4FF;color:#2B6CB0', title:'Ce qu\'il faut vraiment', list:['🛏️ Lit à barreaux avec matelas ferme adapté', '🌡️ Thermomètre de chambre — objectif 18-19°C', '💡 Veilleuse douce — pas de lumière bleue', '👚 Gigoteuse adaptée (0,5 tog été / 2,5 tog hiver)', '🧴 Table à langer avec tout à portée', '🔇 Machine à bruit blanc si besoin'] },
+      { tag:'Protocole', tc:'background:#C6F6D5;color:#276749', title:'Les règles de sécurité non-négociables', protocol:[{l:'1',t:'Lit vide : aucun objet dans le lit avant 12 mois'},{l:'2',t:'Sur le dos : toujours, même si bébé se retourne'},{l:'3',t:'Matelas ferme : il reprend sa forme immédiatement'},{l:'4',t:'Température : 18-19°C. Jamais plus de 20°C.'}] },
+      { tag:'Fiche action', tc:'background:#C6F6D5;color:#276749', title:'Ta checklist est dans le Grimoire', body:'La checklist "Chambre bébé" a été ajoutée à ton Grimoire avec les 15 points essentiels et les critères de validation pour chaque item.' },
+      { tag:'Quiz', tc:'background:#FEF3E0;color:#C47B1E', title:'Valide tes connaissances', body:'8 questions — 8/8 requis. Si tu bloques, on revoit les points difficiles ensemble.', isQuiz:true }
+    ],
+    quiz: [
+      {q:'Quelle température maintenir dans la chambre ?',opts:['15-16°C','18-19°C','21-22°C','24-25°C'],ok:1,fb:{ok:'✅ 18-19°C — ni trop chaud ni trop froid. La surchauffe est un facteur de risque de mort subite.',wrong:'❌ 18-19°C est la plage idéale. Au-dessus de 20°C, risque de surchauffe.'}},
+      {q:'Position de sommeil sécurisée pour un nouveau-né ?',opts:['Sur le ventre','Sur le côté','Sur le dos, toujours','Peu importe si le matelas est ferme'],ok:2,fb:{ok:'✅ Sur le dos, toujours — recommandation internationale unanime.',wrong:'❌ Sur le dos uniquement — seule position recommandée contre la mort subite.'}},
+      {q:'Qu\'est-ce qui ne doit PAS être dans le lit avant 12 mois ?',opts:['Gigoteuse adaptée','Drap-housse ajusté','Doudou ou coussin','Matelas ferme'],ok:2,fb:{ok:'✅ Aucun objet souple : doudous, oreillers, tours de lit augmentent le risque d\'étouffement.',wrong:'❌ Doudous et coussins = risque d\'étouffement avant 12 mois.'}},
+      {q:'Comment tester la fermeté d\'un matelas ?',opts:['Il est doux au toucher','Il reprend sa forme immédiatement après pression','Il s\'enfonce légèrement','Sa couleur indique la fermeté'],ok:1,fb:{ok:'✅ Test de la pression : appuie et relâche — le matelas doit reprendre sa forme immédiatement.',wrong:'❌ Appuie avec la main et relâche — il doit reprendre sa forme immédiatement.'}},
+      {q:'La gigoteuse se choisit selon :',opts:['L\'âge de bébé','Le poids ET la saison (indice tog)','La couleur de la chambre','La marque'],ok:1,fb:{ok:'✅ Poids pour la taille + tog pour la saison : 0,5 tog été, 2,5 tog hiver.',wrong:'❌ Poids de bébé (taille) + tog (chaleur selon saison). Jamais de couverture par-dessus.'}},
+      {q:'À quelle hauteur positionner la table à langer ?',opts:['Au sol','À la hauteur des hanches du parent','Le plus haut possible','Peu importe si bébé est attaché'],ok:1,fb:{ok:'✅ Hauteur des hanches — évite les douleurs lombaires avec des dizaines de changes par jour.',wrong:'❌ Hauteur des hanches du parent qui change — pour éviter le mal de dos.'}},
+      {q:'La chambre doit être prête à :',opts:['La veille de l\'accouchement','J-30 avant le terme','Le jour de la sortie','N\'importe quand avant 6 mois'],ok:1,fb:{ok:'✅ J-30 minimum — les accouchements prématurés arrivent sans prévenir.',wrong:'❌ J-30 minimum. Un accouchement prématuré peut arriver à tout moment.'}},
+      {q:'Le bruit blanc aide bébé car :',opts:['Il assourdit les bruits extérieurs uniquement','Il reproduit les sons entendus in utero','Il joue des berceuses apaisantes','Il n\'aide pas vraiment'],ok:1,fb:{ok:'✅ Le bruit blanc reproduit l\'environnement sonore du ventre maternel — très rassurant pour bébé.',wrong:'❌ Le bruit blanc reproduit les sons in utero (flux sanguin, voix étouffées) — familiers et rassurants.'}}
+    ]
+  },
+
+  'soutien': {
+    title: 'Soutenir Marie pendant la grossesse',
+    phase: 'Grossesse · S14', duration: '8 min', xp: 80,
+    badge: { icon: '💑', name: 'Pilier du Foyer', desc: 'Tu sais exactement comment être là pour Marie — pas juste présent, vraiment utile.' },
+    steps: [
+      { tag:'Concept', tc:'background:#EBF4FF;color:#2B6CB0', title:'Le père n\'est pas un spectateur', body:'La grossesse transforme radicalement le corps et l\'émotionnel de Marie. Ton rôle n\'est pas de "gérer" mais d\'être un vrai soutien — concret, sans jugement, sans te perdre toi-même.' },
+      { tag:'Ce que vit Marie à S14', tc:'background:#FEF3E0;color:#C47B1E', title:'Comprendre pour mieux soutenir', body:'Semaine 14 : les nausées diminuent souvent, l\'énergie revient. Mais le corps change vite — douleurs ligamentaires, essoufflement, émotions intenses. Elle navigue dans un corps qu\'elle ne reconnaît plus.', note:'💡 À S14, 60% des femmes rapportent des sautes d\'humeur intenses liées aux hormones.' },
+      { tag:'Ce qui marche vraiment', tc:'background:#EBF4FF;color:#2B6CB0', title:'Actions concrètes — pas des mots', list:['🍽️ Prendre en charge les repas sans qu\'elle le demande', '🧹 Anticiper les tâches ménagères — pas attendre', '👂 Écouter sans chercher à résoudre tout de suite', '🚗 Conduire aux RDV médicaux et être présent (pas sur le téléphone)', '💤 La laisser dormir — gérer les réveils nocturnes seul si possible'] },
+      { tag:'Ce qui ne marche pas', tc:'background:#FED7D7;color:#9B2335', title:'Les erreurs classiques à éviter', protocol:[{l:'✗',t:'"Repose-toi, c\'est normal" — minimiser ses douleurs'},{l:'✗',t:'Donner des conseils non sollicités sur son corps'},{l:'✗',t:'Comparer avec d\'autres grossesses'},{l:'✗',t:'Être présent physiquement mais absent mentalement (téléphone)'}] },
+      { tag:'Fiche action', tc:'background:#C6F6D5;color:#276749', title:'Ton protocole de soutien S14', body:'3 choses à faire cette semaine :\n\n1. Prendre en charge un repas complet sans qu\'elle le demande\n2. Lui demander ce dont elle a besoin — et faire exactement ça\n3. Planifier ensemble la visite à la maternité Port-Royal pour la préparer', note:'📋 Cette fiche a été ajoutée à ton Grimoire' },
+      { tag:'Quiz', tc:'background:#FEF3E0;color:#C47B1E', title:'Valide tes connaissances', body:'8 questions sur le soutien pendant la grossesse.', isQuiz:true }
+    ],
+    quiz: [
+      {q:'À la semaine 14, qu\'est-ce que Marie ressent souvent ?',opts:['Les nausées s\'intensifient','L\'énergie revient mais le corps change vite','Tout va parfaitement bien','La grossesse n\'est pas encore visible'],ok:1,fb:{ok:'✅ S14 = souvent la fin du 1er trimestre difficile, mais le corps change rapidement.',wrong:'❌ À S14, les nausées diminuent souvent et l\'énergie revient — mais le corps se transforme vite.'}},
+      {q:'Quelle est l\'action la plus utile d\'un père à la maison ?',opts:['Demander comment il peut aider','Anticiper et faire sans qu\'elle demande','Lui rappeler de se reposer','Lui proposer des solutions à ses problèmes'],ok:1,fb:{ok:'✅ Anticiper sans qu\'elle demande — supprimer la charge mentale de déléguer est le vrai soutien.',wrong:'❌ Anticiper et faire sans attendre qu\'elle demande : c\'est supprimer la charge mentale de déléguer.'}},
+      {q:'Comment réagir quand Marie exprime une douleur ?',opts:['Expliquer que c\'est normal','Chercher une solution immédiatement','Écouter sans minimiser ni résoudre','Comparer avec d\'autres grossesses'],ok:2,fb:{ok:'✅ Écouter sans minimiser ni chercher à résoudre immédiatement — c\'est souvent tout ce dont elle a besoin.',wrong:'❌ Écouter sans minimiser est la bonne réponse. Minimiser ("c\'est normal") ou sur-réagir ne l\'aide pas.'}},
+      {q:'Aux RDV médicaux, ton rôle est :',opts:['Attendre dans la salle d\'attente','Être présent et poser des questions','Gérer les appels professionnels pendant','Prendre des notes uniquement'],ok:1,fb:{ok:'✅ Être pleinement présent — téléphone rangé, questions préparées, actif dans la conversation.',wrong:'❌ Être présent et poser des questions préparées. Le téléphone reste rangé.'}},
+      {q:'Combien de femmes enceintes rapportent des sautes d\'humeur intenses ?',opts:['10%','30%','60%','90%'],ok:2,fb:{ok:'✅ 60% — c\'est hormonal, pas émotionnel. La comprendre change ta façon de réagir.',wrong:'❌ 60% des femmes enceintes rapportent des sautes d\'humeur intenses liées aux hormones.'}},
+      {q:'Quelle erreur classique est la plus fréquente ?',opts:['Faire trop de choses','Minimiser les douleurs en disant "c\'est normal"','Poser trop de questions','Proposer trop d\'aide'],ok:1,fb:{ok:'✅ Minimiser avec "c\'est normal" est l\'erreur n°1 — même si c\'est vrai, ça invalide le ressenti.',wrong:'❌ "C\'est normal" est la phrase à éviter — même vraie, elle minimise ce que Marie ressent.'}},
+      {q:'Que faire la nuit si Marie se lève souvent ?',opts:['Dormir pour être reposé le lendemain','Se lever avec elle par solidarité','Gérer ce qui peut l\'être pour qu\'elle reste allongée','Lui proposer des somnifères naturels'],ok:2,fb:{ok:'✅ Gérer ce qui peut l\'être — eau, couverture, lampe — pour minimiser ses réveils.',wrong:'❌ Gérer ce qui peut l\'être (eau, lampe, couverture) pour que ses réveils soient les plus courts possible.'}},
+      {q:'La "charge mentale" de déléguer, c\'est quoi ?',opts:['Le fait de devoir porter les courses','L\'effort de devoir penser, demander et expliquer ce qu\'il faut faire','La fatigue de gérer les enfants','Le coût financier des tâches externalisées'],ok:1,fb:{ok:'✅ Devoir penser + demander + expliquer = charge mentale. Anticiper sans qu\'elle demande l\'élimine.',wrong:'❌ La charge mentale c\'est devoir penser à ce qui doit être fait, puis demander de l\'aide. L\'anticiper l\'élimine.'}}
+    ]
+  },
+
+  'echo': {
+    title: 'L\'écho morphologique — être acteur',
+    phase: 'Grossesse · S22 dans 8 semaines', duration: '9 min', xp: 120,
+    badge: { icon: '🔊', name: 'Écho Master', desc: 'Tu sais exactement quoi regarder et quelles questions poser à l\'écho morphologique.' },
+    steps: [
+      { tag:'Concept', tc:'background:#EBF4FF;color:#2B6CB0', title:'L\'écho morphologique — bien plus qu\'une photo', body:'L\'écho morphologique à la semaine 22 est l\'examen le plus complet de toute la grossesse. Ce n\'est pas juste une belle image — c\'est un bilan médical exhaustif qui prend 30 à 45 minutes.' },
+      { tag:'Ce qu\'on examine', tc:'background:#FEF3E0;color:#C47B1E', title:'Ce que le médecin regarde', list:['🫀 Le cœur : 4 cavités, position, rythme', '🧠 Le cerveau : ventricules, cervelet, corps calleux', '🫁 Les poumons et le diaphragme', '🦴 La colonne vertébrale vertèbre par vertèbre', '👁️ Le visage : lèvres, palais, nez', '📏 Les membres : longueur, forme, mains et pieds', '🩸 Le placenta, le cordon, le liquide amniotique', '📐 Le col de l\'utérus (longueur)'] },
+      { tag:'Ton rôle', tc:'background:#EBF4FF;color:#2B6CB0', title:'Être acteur, pas spectateur', body:'La plupart des pères restent silencieux par peur de déranger. Résultat : ils repartent sans avoir compris ce qu\'ils ont vu.\n\nTon rôle : poser les bonnes questions au bon moment, sans interrompre l\'examen.', note:'💡 Prépare tes questions à l\'avance — pendant l\'examen, le médecin est concentré. Pose-les à la fin.' },
+      { tag:'Protocole', tc:'background:#C6F6D5;color:#276749', title:'Tes 5 questions essentielles', protocol:[{l:'1',t:'Tout est conforme au développement attendu pour S22 ?'},{l:'2',t:'Le placenta est bien positionné (pas praevia) ?'},{l:'3',t:'La longueur du col est normale ?'},{l:'4',t:'Le liquide amniotique est en quantité normale ?'},{l:'5',t:'Faut-il prévoir des examens complémentaires ?'}] },
+      { tag:'Si une anomalie est détectée', tc:'background:#FED7D7;color:#9B2335', title:'Comment réagir si quelque chose est signalé', body:'Ne pas paniquer immédiatement. Les médecins signalent parfois des "variants de la normale" ou des éléments à surveiller qui ne sont pas forcément des anomalies.\n\nDemanser systématiquement : "Quelle est la signification clinique de ce que vous voyez ?" et "Quelle est la prochaine étape ?"' },
+      { tag:'Quiz', tc:'background:#FEF3E0;color:#C47B1E', title:'Valide tes connaissances', body:'8 questions sur l\'écho morphologique.', isQuiz:true }
+    ],
+    quiz: [
+      {q:'À quelle semaine a lieu l\'écho morphologique ?',opts:['S12','S18','S22','S32'],ok:2,fb:{ok:'✅ S22 — c\'est l\'examen le plus complet de la grossesse.',wrong:'❌ L\'écho morphologique a lieu à la semaine 22 — c\'est la référence.'}},
+      {q:'Combien de temps dure un écho morphologique ?',opts:['5-10 min','15-20 min','30-45 min','1 heure'],ok:2,fb:{ok:'✅ 30-45 minutes — c\'est long car l\'examen est très complet.',wrong:'❌ 30 à 45 minutes — chaque structure est examinée en détail.'}},
+      {q:'Quand poser tes questions au médecin ?',opts:['Pendant l\'examen','À la fin de l\'examen','Avant de commencer','Par email après'],ok:1,fb:{ok:'✅ À la fin — pendant l\'examen, le médecin est concentré sur l\'analyse.',wrong:'❌ À la fin de l\'examen — pendant, le médecin a besoin de se concentrer.'}},
+      {q:'Le "placenta praevia" signifie :',opts:['Le placenta est trop petit','Le placenta recouvre le col de l\'utérus','Le placenta est trop grand','Le placenta est bien positionné'],ok:1,fb:{ok:'✅ Placenta praevia = placenta qui recouvre le col — peut nécessiter une césarienne.',wrong:'❌ Placenta praevia = placenta qui recouvre le col de l\'utérus — à surveiller.'}},
+      {q:'Si le médecin signale quelque chose, tu demandes d\'abord :',opts:['Est-ce grave ?','C\'est quoi la signification clinique de ce que vous voyez ?','Faut-il opérer ?','C\'est de ma faute ?'],ok:1,fb:{ok:'✅ "Signification clinique" = comprendre si c\'est une anomalie réelle ou un variant de la normale.',wrong:'❌ Demander la signification clinique est la bonne question — évite la sur-réaction ou la sous-réaction.'}},
+      {q:'Qu\'est-ce qui est examiné à l\'écho morphologique ?',opts:['Uniquement le cœur et le cerveau','Uniquement la taille et le poids','Tous les organes, membres, placenta, cordon et col','Uniquement les chromosomes'],ok:2,fb:{ok:'✅ Tout est examiné : organes, membres, visage, placenta, cordon, liquide amniotique, col.',wrong:'❌ L\'écho morphologique est exhaustif : organes, membres, visage, placenta, cordon, liquide, col.'}},
+      {q:'Le liquide amniotique sert principalement à :',opts:['Nourrir le bébé','Protéger bébé et permettre ses mouvements','Apporter de l\'oxygène','Réguler la température'],ok:1,fb:{ok:'✅ Protection mécanique + liberté de mouvement pour le développement.',wrong:'❌ Le liquide amniotique protège bébé des chocs et lui permet de bouger librement pour se développer.'}},
+      {q:'Un "variant de la normale" signifie :',opts:['Une anomalie grave confirmée','Un élément inhabituel qui n\'est pas forcément une anomalie','Une erreur de l\'échographiste','Un signe que la grossesse va s\'arrêter'],ok:1,fb:{ok:'✅ Variant de la normale = observation inhabituelle qui nécessite surveillance mais pas forcément inquiétude.',wrong:'❌ Un variant de la normale est une observation atypique qui nécessite souvent juste une surveillance.'}}
+    ]
+  },
+
+  'conge': {
+    title: 'Congé paternité — droits et optimisation',
+    phase: 'Grossesse · À planifier', duration: '8 min', xp: 80,
+    badge: { icon: '⏰', name: 'Expert Droits', desc: 'Tu maîtrises ton congé paternité et sais comment l\'optimiser pour être là quand ça compte.' },
+    steps: [
+      { tag:'Concept', tc:'background:#EBF4FF;color:#2B6CB0', title:'28 jours — ton premier grand droit de père', body:'Depuis juillet 2021, le congé paternité en France est passé à 28 jours calendaires (25 jours ouvrables + 3 jours de naissance obligatoires). C\'est une opportunité rare d\'être là à 100% au moment le plus intense.' },
+      { tag:'Les règles', tc:'background:#FEF3E0;color:#C47B1E', title:'Ce que dit la loi', list:['📅 3 jours de naissance : obligatoires, pris à la naissance','📅 25 jours supplémentaires : à prendre dans les 6 mois','💰 Indemnisé par la CPAM à 100% du salaire (plafonné)', '📋 À déclarer à l\'employeur au moins 1 mois avant la date prévue','✂️ Peut être fractionné en 2 périodes (minimum 5 jours chacune)'] },
+      { tag:'L\'optimisation', tc:'background:#EBF4FF;color:#2B6CB0', title:'Comment maximiser ton impact', body:'Les 28 jours sont précieux. La stratégie la plus efficace :\n\n→ Les 3 premiers jours : obligatoires, à la naissance\n→ Jours 4 à 28 : commencer idéalement à la sortie de maternité (J+3 ou J+4)\n→ Ne pas les prendre en août si bébé naît en été — attendre la rentrée quand les aides diminuent', note:'💡 Couplé aux RTT et CP, certains pères arrivent à 6-8 semaines à la maison.' },
+      { tag:'Les démarches', tc:'background:#C6F6D5;color:#276749', title:'Quoi faire et quand', protocol:[{l:'1',t:'Informer l\'employeur par écrit au moins 1 mois avant (lettre recommandée ou email avec accusé)'},{l:'2',t:'Envoyer le certificat de naissance à la CPAM dans les 30 jours suivant la naissance'},{l:'3',t:'Compléter le formulaire CERFA n°11923 ou démarche en ligne ameli.fr'},{l:'4',t:'Vérifier la convention collective pour d\'éventuels droits supplémentaires'}] },
+      { tag:'Ce qu\'on fait vraiment', tc:'background:#EBF4FF;color:#2B6CB0', title:'Comment utiliser ces 28 jours', body:'Ce n\'est pas des vacances. C\'est une montée en compétence intense :\n\n→ Apprendre les gestes techniques (bain, change, biberon)\n→ Installer les routines (bain, repas, coucher)\n→ Permettre à Marie de récupérer\n→ Créer le lien avec bébé dès les premiers jours', note:'📊 Les pères qui prennent leur congé complet ont 3x plus d\'implication parentale à 1 an (étude DREES 2023)' },
+      { tag:'Quiz', tc:'background:#FEF3E0;color:#C47B1E', title:'Valide tes connaissances', body:'8 questions sur le congé paternité.', isQuiz:true }
+    ],
+    quiz: [
+      {q:'Combien de jours dure le congé paternité en France (depuis 2021) ?',opts:['14 jours','21 jours','28 jours calendaires','35 jours'],ok:2,fb:{ok:'✅ 28 jours calendaires depuis juillet 2021 (3 jours naissance + 25 jours).',wrong:'❌ 28 jours calendaires depuis juillet 2021 — soit 3 jours obligatoires + 25 jours supplémentaires.'}},
+      {q:'Les 3 premiers jours de naissance sont :',opts:['Optionnels','Obligatoires et pris à la naissance','À prendre dans les 6 mois','Non rémunérés'],ok:1,fb:{ok:'✅ Les 3 premiers jours sont OBLIGATOIRES et pris immédiatement à la naissance.',wrong:'❌ Les 3 jours de naissance sont obligatoires et doivent être pris immédiatement.'}},
+      {q:'Dans quel délai doit-on informer l\'employeur ?',opts:['À la naissance','2 semaines avant','Au moins 1 mois avant la date prévue','3 mois avant'],ok:2,fb:{ok:'✅ Au moins 1 mois avant — par écrit, lettre recommandée ou email avec accusé.',wrong:'❌ Au moins 1 mois avant la date prévue — par écrit.'}},
+      {q:'Jusqu\'à quand peut-on prendre les 25 jours supplémentaires ?',opts:['Dans les 3 mois','Dans les 6 mois','Dans l\'année','Avant 3 ans de l\'enfant'],ok:1,fb:{ok:'✅ Dans les 6 mois suivant la naissance — à planifier stratégiquement.',wrong:'❌ Dans les 6 mois suivant la naissance.'}},
+      {q:'Le congé paternité peut être fractionné en :',opts:['Autant de périodes que souhaité','2 périodes maximum (5 jours min chacune)','3 périodes de 7 jours','Il ne peut pas être fractionné'],ok:1,fb:{ok:'✅ 2 périodes maximum, avec un minimum de 5 jours par période.',wrong:'❌ Maximum 2 périodes, avec au moins 5 jours chacune.'}},
+      {q:'Qui indemnise le congé paternité ?',opts:['L\'employeur uniquement','La CPAM (Sécurité Sociale)','Pôle Emploi','La CAF'],ok:1,fb:{ok:'✅ La CPAM indemnise à 100% du salaire journalier de référence (plafonné).',wrong:'❌ C\'est la CPAM (Sécurité Sociale) qui indemnise le congé paternité.'}},
+      {q:'Quel formulaire envoyer à la CPAM après la naissance ?',opts:['CERFA n°11923','Formulaire S3704','Attestation employeur uniquement','Aucun formulaire nécessaire'],ok:0,fb:{ok:'✅ CERFA n°11923 — ou démarche en ligne sur ameli.fr dans les 30 jours.',wrong:'❌ CERFA n°11923 ou démarche sur ameli.fr dans les 30 jours suivant la naissance.'}},
+      {q:'Selon l\'étude DREES 2023, les pères qui prennent leur congé complet ont :',opts:['La même implication que les autres à 1 an','2x plus d\'implication parentale à 1 an','3x plus d\'implication parentale à 1 an','Moins d\'implication car ils reprennent le travail après'],ok:2,fb:{ok:'✅ 3x plus d\'implication parentale à 1 an — le congé crée le lien fondateur.',wrong:'❌ 3x plus d\'implication parentale à 1 an — le congé paternité est un investissement à long terme.'}}
+    ]
+  }
+};
+
+// Current module state
+let currentModuleKey = 'chambre';
+let currentModule = MODULES_DATA[currentModuleKey];
+
+let step=0, qIdx=0, qScore=0, selQ=null;
+
+function showBriefView(v) {
+  ['brief-cat','brief-reader','brief-quiz','brief-badge'].forEach(id=>{
+    const el=document.getElementById(id); el.style.display='none'; el.style.flexDirection='';
+  });
+  const t=document.getElementById('brief-'+v); t.style.display='flex'; t.style.flexDirection='column';
+}
+function openModule(key) {
+  currentModuleKey = key || 'chambre';
+  currentModule = MODULES_DATA[currentModuleKey];
+  step=0; qIdx=0; qScore=0; selQ=null;
+  document.getElementById('r-mod-name').textContent = currentModule.title;
+  renderStep();
+  showBriefView('reader');
+}
+function closeReader() { showBriefView('cat'); }
+function filterB(el,phase) {
+  document.querySelectorAll('.phase-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active');
+  document.querySelectorAll('#brief-list .mod-card, #brief-list .phase-sep').forEach(item=>{
+    item.style.display=(phase==='all'||item.dataset.g===phase||!item.dataset.g)?'':'none';
+  });
+}
+
+function renderStep() {
+  const s=currentModule.steps[step]; const total=currentModule.steps.length;
+  document.getElementById('r-lbl').textContent='Étape '+(step+1)+' / '+total;
+  const dots=document.getElementById('r-dots');
+  dots.innerHTML=currentModule.steps.map((_,i)=>'<div class="sdot '+(i<step?'done':i===step?'active':'todo')+'"></div>').join('');
+  let html='<div class="step-tag" style="'+s.tc+'">'+s.tag+'</div><div class="step-title">'+s.title+'</div>';
+  if(s.body) html+='<div class="step-body">'+s.body.replace(/\n/g,'<br>')+'</div>';
+  if(s.list) html+=s.list.map(i=>'<div class="step-item">'+i+'</div>').join('');
+  if(s.protocol) html+='<div class="proto-card"><div class="proto-title">Règles</div>'+s.protocol.map(p=>'<div class="proto-item"><div class="proto-l">'+p.l+'</div><div class="proto-t">'+p.t+'</div></div>').join('')+'</div>';
+  if(s.note) html+='<div class="step-note">'+s.note+'</div>';
+  if(s.isQuiz) html+='<div style="margin-top:12px;background:var(--amber-l);border-radius:14px;padding:14px;font-size:13px;color:var(--amber-d)">🎯 8 questions — 8/8 requis. Si tu bloques, on revoit ensemble les points difficiles.</div>';
+  document.getElementById('r-body').innerHTML=html;
+  document.getElementById('r-body').scrollTop=0;
+  const btn=document.getElementById('r-btn');
+  btn.textContent=s.isQuiz?'Commencer le quiz →':step===total-1?'Terminer →':'Continuer →';
+}
+
+function nextStep() {
+  if(STEPS[step].isQuiz) { startQuiz(); return; }
+  if(step<currentModule.steps.length-1) { step++; renderStep(); } else startQuiz();
+}
+
+function startQuiz() { qIdx=0; qScore=0; selQ=null; renderQuiz(); showBriefView('quiz'); }
+
+function renderQuiz() {
+  const q=currentModule.quiz[qIdx];
+  document.getElementById('q-lbl').textContent='Question '+(qIdx+1)+' / '+currentModule.quiz.length;
+  const dots=document.getElementById('q-dots');
+  dots.innerHTML=currentModule.quiz.map((_,i)=>'<div class="sdot '+(i<qIdx?'done':i===qIdx?'active':'todo')+'"></div>').join('');
+  document.getElementById('q-body').innerHTML=
+    '<div style="font-size:10px;color:var(--grey);margin-bottom:8px">Question '+(qIdx+1)+' sur '+QUIZ.length+'</div>'+
+    '<div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;line-height:1.4">'+q.q+'</div>'+
+    q.opts.map((o,i)=>'<div class="quiz-opt" id="qo-'+i+'" onclick="selAns('+i+')">'+o+'</div>').join('')+
+    '<div class="quiz-fb" id="qfb"></div>';
+  selQ=null;
+  const btn=document.getElementById('q-btn'); btn.disabled=true; btn.style.opacity='.4';
+  btn.textContent=qIdx<currentModule.quiz.length-1?'Question suivante →':'Voir mon badge →';
+}
+
+function selAns(idx) {
+  if(selQ!==null) return;
+  selQ=idx; const q=currentModule.quiz[qIdx]; const ok=idx===q.ok; if(ok) qScore++;
+  q.opts.forEach(function(_,i){
+    const el=document.getElementById('qo-'+i); el.classList.add('disabled');
+    if(i===q.ok) el.classList.add('correct'); else if(i===idx&&!ok) el.classList.add('wrong');
+  });
+  const fb=document.getElementById('qfb');
+  fb.textContent=ok?q.fb.ok:q.fb.wrong;
+  fb.style.background=ok?'var(--green-l)':'var(--red-l)'; fb.style.color=ok?'var(--green)':'var(--red)';
+  fb.classList.add('show');
+  const btn=document.getElementById('q-btn'); btn.disabled=false; btn.style.opacity='1';
+}
+
+function nextQuiz() {
+  if(qIdx<currentModule.quiz.length-1) { qIdx++; renderQuiz(); } else showBadge();
+}
+
+async function showBadge() {
+  const b = currentModule.badge;
+  document.getElementById('b-icon').textContent = b.icon;
+  document.getElementById('b-name').textContent = b.name;
+  document.getElementById('b-desc').textContent = 'Score '+qScore+'/'+currentModule.quiz.length+' · '+b.desc;
+  document.getElementById('b-xp').textContent = '+'+currentModule.xp+' XP — Père en devenir';
+  showBriefView('badge');
+  // Save to Supabase
+  try {
+    await saveModuleProgress(currentModuleKey, 'complete', qScore);
+  } catch(e) { console.log('Supabase save:', e.message); }
+}
+
+// === PANELS ===
+const PANELS = {};
+PANELS['premium'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px">👑 Passer Premium</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px">Débloque l&#39;expérience complète</div><div style="background:linear-gradient(135deg,var(--purple),var(--purple-m));border-radius:16px;padding:18px;margin-bottom:14px"><div style="font-size:16px;font-weight:700;color:white;margin-bottom:12px">IA illimitée 24h/24</div><div style="font-size:13px;color:white;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)">✓ Chat IA sans limite</div><div style="font-size:13px;color:white;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)">✓ 100+ modules Brief</div><div style="font-size:13px;color:white;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)">✓ Grimoire complet</div><div style="font-size:13px;color:white;padding:5px 0">✓ Partage sécurisé documents</div></div><div style="display:flex;align-items:baseline;gap:4px;margin-bottom:14px"><span style="font-size:32px;font-weight:700;color:var(--navy)">5,99€</span><span style="font-size:14px;color:var(--grey)">/mois · Sans engagement</span></div><button onclick="closePanel();showToast(String.fromCharCode(127881)+" Essai Premium activé !")" style="width:100%;padding:14px;background:var(--purple);color:white;border:none;border-radius:14px;font-size:15px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer;margin-bottom:8px">Essai gratuit 14 jours</button><div style="text-align:center;font-size:12px;color:var(--grey)">Sans carte bancaire · Annulable à tout moment</div>`;
+PANELS['community'] = `<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">👥</div><div style="font-size:17px;font-weight:600;color:var(--navy);margin-bottom:8px">Communauté des pères</div><div style="font-size:13px;color:var(--grey);margin-bottom:20px;line-height:1.6">Groupes par situation, forum modéré, lives experts en construction pour la Phase 2.</div><div style="background:var(--purple-l);border-radius:14px;padding:14px;font-size:13px;color:var(--purple)">Disponible au lancement officiel</div></div>`;
+PANELS['ia-ctx'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px">👶 Contexte actif</div><div style="background:var(--purple-l);border-radius:14px;padding:14px"><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(60,52,137,.1);font-size:13px"><span style="color:var(--grey)">Père</span><span style="font-weight:500">Thomas</span></div><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(60,52,137,.1);font-size:13px"><span style="color:var(--grey)">Situation</span><span style="font-weight:500">Grossesse S14</span></div><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(60,52,137,.1);font-size:13px"><span style="color:var(--grey)">Partenaire</span><span style="font-weight:500">Marie</span></div><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(60,52,137,.1);font-size:13px"><span style="color:var(--grey)">Terme</span><span style="font-weight:500">15 oct. 2026</span></div><div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span style="color:var(--grey)">Prochaine écho</span><span style="font-weight:500">S22 - 24 juin</span></div></div>`;
+PANELS['ia-hist'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Historique</div><div style="font-size:13px;color:var(--grey);text-align:center;padding:20px">Les conversations apparaîtront ici</div>`;
+PANELS['rdv-echo'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px">Écho morphologique S22</div><div style="background:var(--amber-l);border:1px solid var(--amber-d);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:14px;font-weight:600;color:var(--amber-d)">24 juin 2026 - Dr. Lemaire</div></div><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px">Questions à préparer</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:8px">Tout est conforme au développement pour S22 ?</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:8px">Le placenta est bien positionné ?</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:8px">Les organes vitaux sont visibles et normaux ?</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey)">Des examens complémentaires avant la S28 ?</div>`;
+PANELS['gen-check'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Nouvelle checklist</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div onclick="closePanel();showToast(&quot;Valise maternité générée !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">🏥</div><div style="font-size:12px;font-weight:500;color:var(--navy)">Valise maternité</div></div><div onclick="closePanel();showToast(&quot;Chambre bébé générée !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">🏠</div><div style="font-size:12px;font-weight:500;color:var(--navy)">Chambre bébé</div></div><div onclick="closePanel();showToast(&quot;Admin naissance générée !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">📋</div><div style="font-size:12px;font-weight:500;color:var(--navy)">Admin naissance</div></div><div onclick="closePanel();showToast(&quot;Premier voyage généré !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">✈️</div><div style="font-size:12px;font-weight:500;color:var(--navy)">Premier voyage</div></div><div onclick="closePanel();showToast(&quot;Liste de naissance générée !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">🛒</div><div style="font-size:12px;font-weight:500;color:var(--navy)">Liste de naissance</div></div><div onclick="closePanel();showToast(&quot;RDV pédiatre généré !&quot;)" style="padding:14px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;text-align:center"><div style="font-size:26px;margin-bottom:6px">🏥</div><div style="font-size:12px;font-weight:500;color:var(--navy)">1er RDV pédiatre</div></div></div>`;
+PANELS['view-doc'] = `<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:6px">Résultats prise de sang T1</div><div style="font-size:12px;color:var(--grey);margin-bottom:20px">Santé - PDF - 245 ko - Chiffré AES-256</div><div style="background:var(--teal-l);border-radius:14px;padding:14px;font-size:13px;color:var(--teal)">Document sécurisé</div></div>`;
+PANELS['add-doc'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Ajouter un document</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div onclick="closePanel();showToast("Document ajouté !")" style="padding:20px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;text-align:center;cursor:pointer"><div style="font-size:28px;margin-bottom:8px">📸</div><div style="font-size:13px;font-weight:600;color:var(--navy)">Photo</div></div><div onclick="closePanel();showToast("Document ajouté !")" style="padding:20px;background:var(--grey-l);border:1.5px solid var(--border);border-radius:14px;text-align:center;cursor:pointer"><div style="font-size:28px;margin-bottom:8px">📂</div><div style="font-size:13px;font-weight:600;color:var(--navy)">Fichier PDF</div></div></div>`;
+PANELS['badges'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Mes badges</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px"><div style="font-size:28px;margin-bottom:6px">🌱</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Père en devenir</div><div style="font-size:10px;color:var(--grey);margin-top:3px">Débloqué</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px"><div style="font-size:28px;margin-bottom:6px">🧬</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Explorateur</div><div style="font-size:10px;color:var(--grey);margin-top:3px">Débloqué</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px"><div style="font-size:28px;margin-bottom:6px">🔊</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Écho Master</div><div style="font-size:10px;color:var(--grey);margin-top:3px">Débloqué</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px"><div style="font-size:28px;margin-bottom:6px">🏠</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Chef Logistique</div><div style="font-size:10px;color:var(--grey);margin-top:3px">En cours</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:6px">🛁</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Maître du Bain</div><div style="font-size:10px;color:var(--grey);margin-top:3px">🔒</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border:1px solid var(--border);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:6px">😭</div><div style="font-size:11px;font-weight:500;color:var(--navy)">Décodeur Pleurs</div><div style="font-size:10px;color:var(--grey);margin-top:3px">🔒</div></div></div>`;
+PANELS['notifs'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Notifications</div><div style="display:flex;gap:12px;padding:12px;background:var(--amber-l);border-radius:14px;margin-bottom:8px;cursor:pointer" onclick="closePanel()"><div style="font-size:22px;flex-shrink:0">🔊</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Écho morphologique dans 8 semaines</div><div style="font-size:11px;color:var(--grey)">Prépare tes questions</div></div><div style="font-size:11px;color:var(--grey);flex-shrink:0">J-56</div></div><div style="display:flex;gap:12px;padding:12px;background:var(--blue-l);border-radius:14px;margin-bottom:8px;cursor:pointer" onclick="closePanel()"><div style="font-size:22px;flex-shrink:0">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Module Brief disponible</div><div style="font-size:11px;color:var(--grey)">Préparer la chambre - 10 min</div></div><div style="font-size:11px;color:var(--grey);flex-shrink:0">Maintenant</div></div><div style="display:flex;gap:12px;padding:12px;background:var(--red-l);border-radius:14px;margin-bottom:8px;cursor:pointer" onclick="closePanel()"><div style="font-size:22px;flex-shrink:0">📄</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Document manquant</div><div style="font-size:11px;color:var(--grey)">Résultats sanguins T1</div></div><div style="font-size:11px;color:var(--grey);flex-shrink:0">Hier</div></div>`;
+PANELS['profil-edit'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Mon profil</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Prénom</div><input type="text" value="Thomas" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Email</div><input type="email" value="thomas@exemple.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Profil sauvegardé !")" style="width:100%;margin-top:16px;padding:13px;background:var(--navy);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Sauvegarder</button>`;
+PANELS['bebe-profil'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Grossesse - Semaine 14</div><div style="background:var(--teal-l);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:13px;color:var(--teal);line-height:1.6">Semaine 14 - Début du 2ème trimestre. Le bébé mesure environ 8,5 cm. Terme prévu : 15 octobre 2026.</div></div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Semaine de grossesse</div><input type="number" value="14" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Profil mis à jour !")" style="width:100%;margin-top:16px;padding:13px;background:var(--navy);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Sauvegarder</button>`;
+PANELS['edit-grossesse'] = PANELS['bebe-profil'];
+PANELS['edit-coparent'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Fiche co-parent</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Prénom</div><input type="text" value="Marie" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Téléphone</div><input type="tel" value="06 12 34 56 78" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Groupe sanguin</div><input type="text" value="O+" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Allergies</div><input type="text" value="Pénicilline" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Fiche co-parent sauvegardée !")" style="width:100%;margin-top:16px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Sauvegarder</button>`;
+PANELS['add-rdv'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Nouveau RDV</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Type</div><input type="text" placeholder="Gynecologue, sage-femme..." style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Date et heure</div><input type="datetime-local" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Praticien</div><input type="text" placeholder="Dr. Lemaire" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("RDV ajouté !")" style="width:100%;margin-top:16px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Ajouter le RDV</button>`;
+PANELS['bebe-dev'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Bébé en semaine 14</div><div style="background:var(--teal-l);border-radius:14px;padding:16px;margin-bottom:14px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:36px">🍋</div><div><div style="font-size:18px;font-weight:700;color:var(--teal)">Taille d&#39;un citron</div><div style="font-size:13px;color:var(--grey)">8,5 cm · environ 43 grammes</div></div></div></div><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px">Ce qui se passe cette semaine</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Le visage prend forme — les muscles faciaux s&#39;exercent déjà</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Le pouce est parfois suçé in utero</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Les mouvements sont actifs mais pas encore perçus par Marie</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey)">L&#39;ouïe commence à se développer — il entend déjà ta voix</div>`;
+PANELS['partage-actif'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Partages actifs</div><div style="background:var(--grey-l);border-radius:14px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:13px;font-weight:600">CR Écho T1</div><span class="pill pill-ok">Actif</span></div><div style="font-size:12px;color:var(--grey);margin-bottom:6px">Partagé avec Dr. Lemaire · Expire dans 7j</div><button onclick="showToast("Partage révoqué !")" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:DM Sans,sans-serif">Révoquer l'accès</button></div><div style="background:var(--grey-l);border-radius:14px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:13px;font-weight:600">Résultats prise de sang</div><span class="pill pill-ok">Actif</span></div><div style="font-size:12px;color:var(--grey);margin-bottom:6px">Partagé avec Sage-femme Durand · Expire dans 2j</div><button onclick="showToast("Partage révoqué !")" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:DM Sans,sans-serif">Révoquer l'accès</button></div>`;
+PANELS['nouveau-partage'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Nouveau partage sécurisé</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Document à partager</div><select style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:DM Sans,sans-serif"><option>CR Écho T1 — S12</option><option>Résultats prise de sang T1</option><option>Ordonnance Acide folique</option></select></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Destinataire</div><input type="email" placeholder="medecin@clinique.fr" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:8px">Durée d&#39;accès</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div onclick="selDuree(this)" style="padding:10px;background:var(--grey-l);border:2px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500">1 heure</div><div onclick="selDuree(this)" style="padding:10px;background:var(--blue-l);border:2px solid var(--blue);border-radius:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--blue)">24 heures</div><div onclick="selDuree(this)" style="padding:10px;background:var(--grey-l);border:2px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500">7 jours</div><div onclick="selDuree(this)" style="padding:10px;background:var(--grey-l);border:2px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500">Permanent</div></div></div></div><button onclick="closePanel();showToast("Lien de partage envoyé !")" style="width:100%;margin-top:8px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Envoyer le lien sécurisé</button>`;
+PANELS['proto-contraction'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Contractions — quand partir ?</div><div style="background:var(--red-l);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px">Règle 5-1-1</div><div style="font-size:13px;color:var(--text);line-height:1.6">Contractions toutes les 5 minutes · Durant 1 minute · Depuis 1 heure → PARTIR à la maternité</div></div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Premier bébé : attendre 5-1-1 confirmé</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Appeler la maternité en cas de doute : 01 58 41 41 41</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey)">Allergie pénicilline de Marie : à signaler à l&#39;arrivée</div>`;
+PANELS['proto-eau'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Perte des eaux — quoi faire</div><div style="display:flex;flex-direction:column;gap:8px"><div style="padding:12px 14px;background:var(--blue-l);border-radius:12px;display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">1️⃣</div><div style="font-size:13px;color:var(--blue)">Note l&#39;heure et la couleur du liquide (clair = normal, vert ou marron = urgence)</div></div><div style="padding:12px 14px;background:var(--blue-l);border-radius:12px;display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">2️⃣</div><div style="font-size:13px;color:var(--blue)">Appelle la maternité immédiatement : 01 58 41 41 41</div></div><div style="padding:12px 14px;background:var(--blue-l);border-radius:12px;display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">3️⃣</div><div style="font-size:13px;color:var(--blue)">Prépare la valise et pars à la maternité dans les 2h maximum</div></div><div style="padding:12px 14px;background:var(--red-l);border-radius:12px;display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">⚠️</div><div style="font-size:13px;color:var(--red)">Liquide vert ou marron → SAMU 15 immédiatement</div></div></div>`;
+PANELS['attente-echo'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Écho morphologique S22</div><div style="background:var(--amber-l);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:var(--amber-d);margin-bottom:3px">24 juin 2026 — dans 22 jours</div><div style="font-size:12px;color:var(--grey)">Dr. Lemaire · 10h30 · Cabinet de radiologie</div></div><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px">Questions à préparer avec l'IA</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Tous les organes sont-ils bien formés ?</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey);margin-bottom:6px">Le placenta est-il bien positionné ?</div><div style="padding:10px 12px;background:var(--grey-l);border-radius:10px;font-size:13px;color:var(--grey)">Le col est-il de longueur normale ?</div><button onclick="goTab('ia','#3C3489');closePanel();sendQ('Écho morphologique S22 dans 22 jours — quelles questions dois-je préparer ?')" style="width:100%;margin-top:12px;padding:13px;background:var(--purple);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Demander à l'IA de préparer mes questions →</button>`;
+PANELS['share-check'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Partager la checklist</div><div style="background:var(--green-l);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--green)">Partage la checklist valise maternité avec Marie ou tes parents pour qu&#39;ils puissent aussi cocher les items.</div><button onclick="closePanel();showToast("Lien copié dans le presse-papier !")" style="width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer;margin-bottom:8px">Copier le lien de partage</button><button onclick="closePanel();showToast("Message envoyé à Marie !")" style="width:100%;padding:13px;background:transparent;color:var(--teal);border:1.5px solid var(--teal);border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Envoyer à Marie par SMS</button>`;
+PANELS['edit-medical'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Informations médicales</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Groupe sanguin Marie</div><input type="text" value="O+" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Allergies</div><input type="text" value="Pénicilline" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Maternité choisie</div><input type="text" value="Port-Royal - Paris 14e" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Informations sauvegardées !")" style="width:100%;margin-top:16px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Sauvegarder</button>`;
+PANELS['add-mesure'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Ajouter une mesure</div><div style="display:flex;flex-direction:column;gap:12px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Semaine de grossesse</div><input type="number" value="14" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Poids de Marie (kg)</div><input type="number" value="62.0" step="0.1" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Tension artérielle</div><input type="text" placeholder="Ex: 11/7" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Mesure enregistrée !")" style="width:100%;margin-top:16px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Enregistrer</button>`;
+PANELS['view-doc-sang'] = PANELS['view-doc-echo'] = PANELS['view-doc-sf'] = PANELS['view-doc-ordo'] = PANELS['view-doc-dec'] = PANELS['view-doc-conge'] = PANELS['view-doc-mutuelle'] = PANELS['view-doc'];
+PANELS['proto-allergie'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Allergie pénicilline de Marie</div><div style="background:var(--red-l);border:1.5px solid var(--red);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px">À signaler impérativement</div><div style="font-size:13px;color:var(--text);line-height:1.6">Marie est allergique à la pénicilline. Signaler à l&#39;arrivée à la maternité, au médecin anesthésiste, et à tout soignant.</div></div><div style="font-size:13px;color:var(--grey);line-height:1.6">Alternatives utilisées : macrolides ou céphalosporines (à confirmer avec le médecin).</div>`;
+PANELS['edit-urgence'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Contacts d&#39;urgence</div><div style="display:flex;flex-direction:column;gap:10px"><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Maternité</div><input type="text" value="01 58 41 41 41" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div><div><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:6px">Parents de Marie</div><input type="text" value="06 98 76 54 32" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:DM Sans,sans-serif"></div></div><button onclick="closePanel();showToast("Contacts sauvegardés !")" style="width:100%;margin-top:16px;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Sauvegarder</button>`;
+PANELS['search'] =
+PANELS['search'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Rechercher</div><input type="text" placeholder="ordonnance, vaccin, échographie..." style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-family:DM Sans,sans-serif;margin-bottom:16px"><div style="font-size:13px;color:var(--grey);text-align:center;padding:20px">La recherche intelligente sera disponible avec Supabase</div>`;
+PANELS['notifs-settings'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">Notifications</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)"><span style="font-size:14px;color:var(--text)">RDV médicaux</span><div style="width:44px;height:24px;background:var(--green);border-radius:12px"></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)"><span style="font-size:14px;color:var(--text)">Modules Brief</span><div style="width:44px;height:24px;background:var(--green);border-radius:12px"></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0"><span style="font-size:14px;color:var(--text)">Rappels quotidiens</span><div style="width:44px;height:24px;background:var(--border);border-radius:12px"></div></div></div>`;
+
+PANELS['all-badges'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px">🏆 Tous mes badges</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px">3 débloqués · 8 à venir</div><div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Débloqués</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"><div style="text-align:center;padding:12px;background:var(--green-l);border-radius:14px"><div style="font-size:28px;margin-bottom:5px">🌱</div><div style="font-size:11px;font-weight:600;color:var(--navy)">Père en devenir</div><div style="font-size:10px;color:var(--green);margin-top:2px">+80 XP</div></div><div style="text-align:center;padding:12px;background:var(--blue-l);border-radius:14px"><div style="font-size:28px;margin-bottom:5px">🧬</div><div style="font-size:11px;font-weight:600;color:var(--navy)">Explorateur</div><div style="font-size:10px;color:var(--blue);margin-top:2px">+100 XP</div></div><div style="text-align:center;padding:12px;background:var(--purple-l);border-radius:14px"><div style="font-size:28px;margin-bottom:5px">🔊</div><div style="font-size:11px;font-weight:600;color:var(--navy)">Écho Master</div><div style="font-size:10px;color:var(--purple);margin-top:2px">+80 XP</div></div></div><div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">À venir</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">🏠</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Chef Logistique</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">💑</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Pilier du Foyer</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">⏰</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Expert Droits</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">🏥</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Maître Valise</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">😭</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Décodeur Pleurs</div></div><div style="text-align:center;padding:12px;background:var(--grey-l);border-radius:14px;opacity:.45"><div style="font-size:28px;margin-bottom:5px">🛁</div><div style="font-size:11px;font-weight:500;color:var(--grey)">Maître du Bain</div></div></div>`;
+PANELS['badge-detail-1'] = `<div style="text-align:center;padding:20px 0"><div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#276749,#1a4a30);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px;box-shadow:0 8px 24px rgba(39,103,73,.35)">🌱</div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px">Père en devenir</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">Débloqué à la création du compte. Premier pas dans le parcours ToBeFather.</div><div style="background:var(--green-l);border-radius:12px;padding:12px;font-size:13px;color:var(--green)">+80 XP débloqués · 3 juin 2026</div></div>`;
+PANELS['badge-detail-2'] = `<div style="text-align:center;padding:20px 0"><div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#2B6CB0,#1B3A5C);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px;box-shadow:0 8px 24px rgba(43,108,176,.35)">🧬</div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px">Explorateur du Ventre</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">Module Développement fœtal complété avec 8/8 au quiz.</div><div style="background:var(--blue-l);border-radius:12px;padding:12px;font-size:13px;color:var(--blue)">+100 XP débloqués · 1 juin 2026</div></div>`;
+PANELS['badge-detail-3'] = `<div style="text-align:center;padding:20px 0"><div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#3C3489,#2B246B);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px;box-shadow:0 8px 24px rgba(60,52,137,.35)">🔊</div><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px">Écho Master</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">Module Échographies complété. Tu sais exactement quoi regarder et quelles questions poser.</div><div style="background:var(--purple-l);border-radius:12px;padding:12px;font-size:13px;color:var(--purple)">+80 XP débloqués · 2 juin 2026</div></div>`;
+PANELS['supabase-info'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px">🗄️ Connecter Supabase</div><div style="font-size:13px;color:var(--grey);margin-bottom:16px">Synchroniser tes données en temps réel</div><div style="background:var(--teal-l);border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:6px">Ce que Supabase apporte</div><div style="font-size:12px;color:var(--grey);line-height:1.7">✓ Tes données sauvegardées entre sessions<br>✓ Synchronisation multi-appareils<br>✓ Partage co-parent en temps réel<br>✓ Historique IA persistant</div></div><div style="font-size:12px;color:var(--grey);margin-bottom:8px">Pour connecter : va sur supabase.com, crée un projet et fournis ton URL + clé anon à l'équipe ToBeFather.</div><button onclick="closePanel()" style="width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:14px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;cursor:pointer">Compris</button>`;
+PANELS['settings'] = `<div style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px">⚙️ Paramètres</div><div class="menu-item" onclick="openPanel('profil-edit')"><div class="menu-icon" style="background:var(--blue-l)">👤</div><div class="menu-label">Modifier le profil</div><div class="menu-arrow">›</div></div><div class="menu-item" onclick="openPanel('notifs-settings')"><div class="menu-icon" style="background:var(--grey-l)">🔔</div><div class="menu-label">Notifications</div><div class="menu-arrow">›</div></div><div class="menu-item" onclick="openPanel('premium')"><div class="menu-icon" style="background:var(--amber-l)">👑</div><div class="menu-label">Premium</div><div class="menu-arrow">›</div></div><div class="menu-item" onclick="closePanel();showToast('Déconnecté')"><div class="menu-icon" style="background:var(--red-l)">🚪</div><div class="menu-label" style="color:var(--red)">Se déconnecter</div><div class="menu-arrow" style="color:var(--red)">›</div></div>`;
+
+function selDuree(el) {
+  el.closest('div').querySelectorAll('div[onclick^="selDuree"]').forEach(function(d) {
+    d.style.background = 'var(--grey-l)';
+    d.style.borderColor = 'var(--border)';
+    d.style.color = 'var(--text)';
+  });
+  el.style.background = 'var(--blue-l)';
+  el.style.borderColor = 'var(--blue)';
+  el.style.color = 'var(--blue)';
+}
+
+function openPanel(key) {
+  const c=PANELS[key]||'<div style="text-align:center;padding:24px 0"><div style="font-size:40px;margin-bottom:12px">🔨</div><div style="font-size:16px;font-weight:600;color:var(--navy)">Bientôt disponible</div></div>';
+  document.getElementById('panel-inner').innerHTML=c;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel() { document.getElementById('panel').classList.remove('open'); }
+
+// ═══ TOAST ═══
+let toastTimer;
+function showToast(msg,isErr) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=isErr?'var(--red)':'var(--green)';
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══ APP INIT ═══
+if (typeof window !== 'undefined') { window.addEventListener('DOMContentLoaded', function() { initApp(); }); }
+
+// ═══ CLOCK ═══
+function tick() { const n=new Date(); document.getElementById('sb-time').textContent=n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'); }
+tick(); setInterval(tick,10000);
+
+// ═══ INIT ═══
+showBriefView('cat');
+</script>
+</body>
+</html><div id="brief-list" class="body" style="padding:14px">
+
+      <div class="phase-sep" data-g="grossesse">Grossesse — En cours</div>
+
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')">
+        <div class="mod-ic" style="background:var(--green-l)">🌱</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">L'envie d'avoir un enfant</div>
+          <div style="font-size:11px;color:var(--green)">✓ Complété · +80 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--green-l)">✓</div>
+      </div>
+
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')">
+        <div class="mod-ic" style="background:var(--green-l)">🧬</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Comprendre le développement fœtal</div>
+          <div style="font-size:11px;color:var(--green)">✓ Complété · +100 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--green-l)">✓</div>
+      </div>
+
+      <div class="mod-card done" data-g="grossesse" onclick="showToast('Module déjà complété ✓')">
+        <div class="mod-ic" style="background:var(--green-l)">🔊</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Mon rôle aux échographies</div>
+          <div style="font-size:11px;color:var(--green)">✓ Complété · +80 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--green-l)">✓</div>
+      </div>
+
+      <div class="mod-card current" data-g="grossesse" onclick="openModule('chambre')">
+        <div class="mod-ic" style="background:var(--amber-l)">🏠</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Préparer la chambre de bébé</div>
+          <div style="font-size:11px;color:var(--amber-d);font-weight:600">En cours · 10 min · +100 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--amber-l)">▶</div>
+      </div>
+
+      <div class="mod-card" data-g="grossesse" onclick="openModule('soutien')">
+        <div class="mod-ic" style="background:var(--blue-l)">💑</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Soutenir Marie pendant la grossesse</div>
+          <div style="font-size:11px;color:var(--grey)">8 min · +80 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="mod-card" data-g="grossesse" onclick="openModule('echo')">
+        <div class="mod-ic" style="background:var(--blue-l)">🔊</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">L'écho morphologique — être acteur</div>
+          <div style="font-size:11px;color:var(--grey)">9 min · +120 XP · S22 dans 8 semaines</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="mod-card" data-g="grossesse" onclick="openModule('conge')">
+        <div class="mod-ic" style="background:var(--blue-l)">⏰</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Congé paternité — droits et optimisation</div>
+          <div style="font-size:11px;color:var(--grey)">8 min · +80 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="mod-card" data-g="grossesse" onclick="openModule('chambre')">
+        <div class="mod-ic" style="background:var(--blue-l)">📋</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Construire le plan de naissance</div>
+          <div style="font-size:11px;color:var(--grey)">9 min · +100 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="phase-sep" data-g="accouch">Accouchement — À venir</div>
+
+      <div class="mod-card" data-g="accouch" onclick="openModule('chambre')">
+        <div class="mod-ic" style="background:var(--blue-l)">🏥</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Les 72h à la maternité — protocole père</div>
+          <div style="font-size:11px;color:var(--grey)">12 min · +120 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="mod-card" data-g="accouch" onclick="openModule('chambre')">
+        <div class="mod-ic" style="background:var(--blue-l)">💪</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px">Rester ancré pendant l'accouchement</div>
+          <div style="font-size:11px;color:var(--grey)">10 min · +100 XP</div>
+        </div>
+        <div class="mod-st" style="background:var(--blue-l)">→</div>
+      </div>
+
+      <div class="phase-sep" data-g="0_3">0-3 mois — Après la naissance</div>
+
+      <div class="mod-card locked" data-g="0_3">
+        <div class="mod-ic" style="background:var(--border)">😭</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--grey);margin-bottom:3px">Décoder les pleurs — les 5 signaux</div>
+          <div style="font-size:11px;color:var(--grey)">Disponible à la naissance</div>
+        </div>
+        <div class="mod-st" style="background:var(--border)">🔒</div>
+      </div>
+
+      <div class="mod-card locked" data-g="0_3">
+        <div class="mod-ic" style="background:var(--border)">🛁</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--grey);margin-bottom:3px">Le bain du nourrisson</div>
+          <div style="font-size:11px;color:var(--grey)">Disponible à la naissance</div>
+        </div>
+        <div class="mod-st" style="background:var(--border)">🔒</div>
+      </div>
+
+    </div>
